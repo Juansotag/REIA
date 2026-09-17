@@ -113,19 +113,42 @@ class PrivacyService:
             return texto_ia
 
         resultado = texto_ia
+        nombre_completo = estudiante.nombre_completo
+        pronombre = estudiante.pronombre or ("él" if getattr(estudiante, "genero", "Masculino") == "Masculino" else "ella")
 
-        # Sustituir nombre completo
-        resultado = resultado.replace("[NOMBRE_ESTUDIANTE]", estudiante.nombre_completo)
-        resultado = resultado.replace("[ESTUDIANTE]", estudiante.nombre_completo)
+        # Reemplazo de todas las posibles variantes de placeholders para el nombre
+        patrones_nombre = [
+            r"\[NOMBRE[_\s]+ESTUDIANTE\]",
+            r"\[NOMBRE[_\s]+DEL[_\s]+ESTUDIANTE\]",
+            r"\[NOMBRE[_\s]+DE[_\s]+LA[_\s]+ESTUDIANTE\]",
+            r"\[NOMBRE[_\s]+DEL[_\s]+ALUMNO\]",
+            r"\[NOMBRE[_\s]+DE[_\s]+LA[_\s]+ALUMNA\]",
+            r"\[NOMBRE[_\s]+ALUMNO\]",
+            r"\[NOMBRE\]",
+            r"\[ESTUDIANTE\]",
+            r"\[ALUMNO\]",
+            r"\[ALUMNA\]",
+            r"\[ESTUDIANTE[_\s]+EVALUADO\]",
+            r"<NOMBRE(?:[_\s]+ESTUDIANTE)?>",
+            r"\{NOMBRE(?:[_\s]+ESTUDIANTE)?\}",
+        ]
+        for pat in patrones_nombre:
+            resultado = re.sub(pat, nombre_completo, resultado, flags=re.IGNORECASE)
 
-        # Sustituir pronombre con concordancia
-        pronombre_sujeto = estudiante.pronombre or "él"
-        resultado = resultado.replace("[PRONOMBRE]", pronombre_sujeto)
-        resultado = resultado.replace("[pronombre]", pronombre_sujeto)
+        # Reemplazo de pronombres
+        patrones_pronombre = [
+            r"\[PRONOMBRE\]",
+            r"\[él/ella\]",
+            r"\[él\/ella\]",
+            r"\[el/la\]",
+            r"\[el\/la\]"
+        ]
+        for pat in patrones_pronombre:
+            resultado = re.sub(pat, pronombre, resultado, flags=re.IGNORECASE)
 
-        # Sustituir documento y edad si existieran
-        resultado = resultado.replace("[ID_ESTUDIANTE]", str(estudiante.numero_documento))
-        resultado = resultado.replace("[EDAD]", str(estudiante.edad))
-        resultado = resultado.replace("[GRADO]", f"{estudiante.grado_actual}º Grado")
+        # Documento, edad, grado
+        resultado = re.sub(r"\[(?:NUMERO_)?DOCUMENTO\]|\[ID_ESTUDIANTE\]", str(getattr(estudiante, "numero_documento", "")), resultado, flags=re.IGNORECASE)
+        resultado = re.sub(r"\[EDAD\]", str(getattr(estudiante, "edad", "")), resultado, flags=re.IGNORECASE)
+        resultado = re.sub(r"\[GRADO\]", f"{getattr(estudiante, 'grado_actual', '')}º Grado", resultado, flags=re.IGNORECASE)
 
         return resultado

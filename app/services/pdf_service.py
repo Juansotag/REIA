@@ -132,16 +132,29 @@ class PdfService:
 
         # 4. Narrativa de la IA
         story.append(Paragraph("Análisis Cualitativo y Recomendaciones Pedagógicas", style_heading))
+        import re
         for line in contenido_ia.split("\n"):
             line_str = line.strip()
             if not line_str:
                 continue
-            if line_str.startswith("###") or line_str.startswith("##"):
-                story.append(Paragraph(line_str.lstrip("#").strip(), style_heading))
+            # Convert markdown bold and italic to HTML tags for ReportLab
+            clean_line = line_str
+            clean_line = re.sub(r'\*\*(.*?)\*\*', r'<b>\1</b>', clean_line)
+            clean_line = re.sub(r'\*(.*?)\*', r'<i>\1</i>', clean_line)
+
+            if line_str.startswith("####"):
+                h_text = line_str.lstrip("#").strip()
+                h_text = re.sub(r'\*\*(.*?)\*\*', r'<b>\1</b>', h_text)
+                story.append(Paragraph(h_text, ParagraphStyle("H4Style", parent=style_heading, fontSize=10, spaceBefore=6, spaceAfter=3)))
+            elif line_str.startswith("###") or line_str.startswith("##") or line_str.startswith("#"):
+                h_text = line_str.lstrip("#").strip()
+                h_text = re.sub(r'\*\*(.*?)\*\*', r'<b>\1</b>', h_text)
+                story.append(Paragraph(h_text, style_heading))
             elif line_str.startswith("-") or line_str.startswith("*"):
-                story.append(Paragraph(f"• {line_str.lstrip('-*').strip()}", style_bullet))
+                bullet_text = clean_line.lstrip("-*").strip()
+                story.append(Paragraph(f"• {bullet_text}", style_bullet))
             else:
-                story.append(Paragraph(line_str, style_body))
+                story.append(Paragraph(clean_line, style_body))
 
         # 5. Firmas
         story.append(Spacer(1, 30))

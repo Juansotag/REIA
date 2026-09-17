@@ -119,25 +119,44 @@ class DocxService:
         r_hia.font.size = Pt(13)
         r_hia.font.color.rgb = RGBColor(0, 56, 125)
 
+        import re
         for line in contenido_ia.split("\n"):
             line_str = line.strip()
             if not line_str:
                 continue
-            if line_str.startswith("###") or line_str.startswith("##"):
+            if line_str.startswith("####"):
+                h_sub = doc.add_heading(level=4)
+                r_sub = h_sub.add_run(line_str.lstrip("#").strip())
+                r_sub.font.size = Pt(10)
+                r_sub.font.color.rgb = RGBColor(0, 19, 91)
+            elif line_str.startswith("###") or line_str.startswith("##") or line_str.startswith("#"):
                 h_sub = doc.add_heading(level=3)
                 r_sub = h_sub.add_run(line_str.lstrip("#").strip())
                 r_sub.font.size = Pt(11)
                 r_sub.font.color.rgb = RGBColor(0, 19, 91)
             elif line_str.startswith("-") or line_str.startswith("*"):
                 p_b = doc.add_paragraph(style="List Bullet")
-                r_b = p_b.add_run(line_str.lstrip("-*").strip())
-                r_b.font.size = Pt(10)
-                r_b.font.color.rgb = RGBColor(55, 65, 81)
+                raw_item = line_str.lstrip("-*").strip()
+                parts = re.split(r'(\*\*.*?\*\*)', raw_item)
+                for part in parts:
+                    if part.startswith('**') and part.endswith('**'):
+                        r = p_b.add_run(part[2:-2])
+                        r.bold = True
+                    else:
+                        r = p_b.add_run(part)
+                    r.font.size = Pt(10)
+                    r.font.color.rgb = RGBColor(55, 65, 81)
             else:
                 p = doc.add_paragraph()
-                r_p = p.add_run(line_str)
-                r_p.font.size = Pt(10)
-                r_p.font.color.rgb = RGBColor(55, 65, 81)
+                parts = re.split(r'(\*\*.*?\*\*)', line_str)
+                for part in parts:
+                    if part.startswith('**') and part.endswith('**'):
+                        r = p.add_run(part[2:-2])
+                        r.bold = True
+                    else:
+                        r = p.add_run(part)
+                    r.font.size = Pt(10)
+                    r.font.color.rgb = RGBColor(55, 65, 81)
                 p.paragraph_format.space_after = Pt(6)
 
         # 5. Tabla de Dimensiones de Rúbrica si está presente

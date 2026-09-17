@@ -1,10 +1,10 @@
 <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem;">
-  <!-- Seccion de Informes Guardados -->
+  <!-- Sección de Informes Guardados -->
   <div class="card">
     <div class="card-header-row">
       <div>
         <h3>Informes Generados Recientes ({{ informes_guardados|length }})</h3>
-        <div class="card-description">Haga clic en 'Ver Informe' para consultar el informe generado con su grafica y redescargar Word o PDF.</div>
+        <div class="card-description">Haga clic en 'Ver Informe' para consultar el informe generado con su gráfica y redescargar Word o PDF.</div>
       </div>
     </div>
 
@@ -12,7 +12,7 @@
       <table class="data-table">
         <thead>
           <tr>
-            <th>Fecha Generacion</th>
+            <th>Fecha Generación</th>
             <th>Tipo</th>
             <th>Destinatario / Sujeto</th>
             <th>Periodo Evaluado</th>
@@ -31,7 +31,11 @@
               </span>
             </td>
             <td style="font-weight: 600; color: var(--c-blue-dark);">
-              {% if inf.tipo_informe == 'INDIVIDUAL' and inf.estudiante_id %}
+              {% if inf.tipo_informe == 'INDIVIDUAL' and inf.estudiante %}
+                {{ inf.estudiante.nombre_completo }}
+              {% elif inf.curso %}
+                Curso: {{ inf.curso.nombre }}
+              {% elif inf.estudiante_id %}
                 Estudiante ID: {{ inf.estudiante_id }}
               {% elif inf.curso_id %}
                 Curso ID: {{ inf.curso_id }}
@@ -43,18 +47,28 @@
               {{ inf.fecha_inicio }} al {{ inf.fecha_fin }}
             </td>
             <td style="text-align: right; white-space: nowrap;">
-              <button class="primary" style="padding: 0.35rem 0.8rem; font-size: var(--fs-xs);"
-                      hx-get="/informes/ver-guardado/{{ inf.id }}"
-                      hx-target="#panel-preview"
-                      hx-swap="innerHTML">
-                Ver Informe
-              </button>
+              <div style="display: inline-flex; gap: 0.35rem; align-items: center;">
+                <button type="button" class="primary" style="padding: 0.35rem 0.8rem; font-size: var(--fs-xs);"
+                        hx-get="/informes/ver-guardado/{{ inf.id }}"
+                        hx-target="#panel-preview"
+                        hx-swap="innerHTML"
+                        onclick="cambiarVistaInformes('generador'); window.scrollTo({top: 0, behavior: 'smooth'});">
+                  Ver Informe
+                </button>
+                <button type="button" class="danger" style="background: #96272D; color: #FFFFFF !important; padding: 0.35rem 0.65rem; font-size: var(--fs-xs); border: none; border-radius: var(--radius-sm); font-weight: 600;"
+                        hx-delete="/informes/guardado/{{ inf.id }}"
+                        hx-confirm="¿Está seguro de que desea eliminar este informe del historial?"
+                        hx-target="closest tr"
+                        hx-swap="outerHTML">
+                  Eliminar
+                </button>
+              </div>
             </td>
           </tr>
           {% else %}
           <tr>
             <td colspan="5" style="padding: 2rem; text-align: center; color: var(--text-muted);">
-              No hay informes guardados previamente. Genere un informe en la pestana 'Generar Nuevo Informe' para guardarlo automaticamente.
+              No hay informes guardados previamente. Genere un informe en la pestaña 'Generar Nuevo Informe' para guardarlo automáticamente.
             </td>
           </tr>
           {% endfor %}
@@ -63,12 +77,12 @@
     </div>
   </div>
 
-  <!-- Seccion de Modelos y Plantillas de Informe -->
+  <!-- Sección de Modelos y Plantillas de Informe -->
   <div class="card">
     <div class="card-header-row">
       <div>
         <h3>Modelos y Plantillas de Informe Preconfiguradas</h3>
-        <div class="card-description">Plantillas pedagogicas disenadas por el GovLab para agilizar la redaccion.</div>
+        <div class="card-description">Plantillas pedagógicas diseñadas por el GovLab para agilizar la redacción.</div>
       </div>
     </div>
 

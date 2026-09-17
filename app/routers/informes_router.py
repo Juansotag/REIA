@@ -1,4 +1,7 @@
 import json
+import zipfile
+import io
+import markdown
 from datetime import date
 from fastapi import APIRouter, Depends, Request, Form, Response
 from fastapi.responses import HTMLResponse
@@ -15,10 +18,18 @@ from app.services.pdf_service import PdfService
 router = APIRouter(prefix="/informes", tags=["Informes"])
 templates = Jinja2Templates(directory="templates")
 
+def render_markdown(text: str) -> str:
+    if not text:
+        return ""
+    return markdown.markdown(text, extensions=['extra', 'nl2br', 'sane_lists'])
+
+templates.env.filters["markdown"] = render_markdown
+
 @router.get("", response_class=HTMLResponse)
 def index_informes(request: Request, db: Session = Depends(get_db)):
     estudiantes = db.query(Estudiante).filter_by(activo=True).order_by(Estudiante.apellidos).all()
     cursos = db.query(Curso).order_by(Curso.grado).all()
+    clases = db.query(Clase).order_by(Clase.nombre).all()
     rubricas = db.query(Rubrica).order_by(Rubrica.id).all()
     modelos = db.query(ModeloInforme).order_by(ModeloInforme.id).all()
     informes_guardados = db.query(InformeGenerado).order_by(InformeGenerado.created_at.desc()).limit(20).all()
@@ -27,6 +38,7 @@ def index_informes(request: Request, db: Session = Depends(get_db)):
         "active_tab": "informes",
         "estudiantes": estudiantes,
         "cursos": cursos,
+        "clases": clases,
         "rubricas": rubricas,
         "modelos": modelos,
         "informes_guardados": informes_guardados
@@ -39,6 +51,8 @@ def ver_informe_guardado(informe_id: int, request: Request, db: Session = Depend
         return HTMLResponse("<div class='card'>Informe no encontrado.</div>")
 
     datos_cabecera = {}
+    contenido_narrativo = inf.contenido_narrativo
+
     if inf.tipo_informe == "INDIVIDUAL" and inf.estudiante_id:
         est = db.query(Estudiante).filter_by(id=inf.estudiante_id).first()
         if est:
@@ -48,6 +62,8 @@ def ver_informe_guardado(informe_id: int, request: Request, db: Session = Depend
                 "Grado": f"{est.grado_actual} grado",
                 "Periodo de Evaluacion": f"{inf.fecha_inicio} al {inf.fecha_fin}"
             }
+            # Asegurar que cualquier placeholder residual sea sustituido por el nombre real
+            contenido_narrativo = PrivacyService.reemplazar_tokens_locales(contenido_narrativo, est)
     elif inf.curso_id:
         cur = db.query(Curso).filter_by(id=inf.curso_id).first()
         if cur:
@@ -63,7 +79,7 @@ def ver_informe_guardado(informe_id: int, request: Request, db: Session = Depend
     payload_exportacion = json.dumps({
         "titulo_informe": titulo_informe,
         "datos_cabecera": datos_cabecera,
-        "contenido_narrativo": inf.contenido_narrativo,
+        "contenido_narrativo": contenido_narrativo,
         "grafica_base64": inf.datos_grafica.get("grafica_base64") if inf.datos_grafica else None,
         "tabla_rubrica": inf.datos_grafica.get("tabla_rubrica", []) if inf.datos_grafica else []
     })
@@ -75,10 +91,19 @@ def ver_informe_guardado(informe_id: int, request: Request, db: Session = Depend
         "rubrica": None,
         "datos_cabecera": datos_cabecera,
         "grafica_base64": inf.datos_grafica.get("grafica_base64") if inf.datos_grafica else None,
-        "contenido_narrativo": inf.contenido_narrativo,
+        "contenido_narrativo": contenido_narrativo,
         "tabla_rubrica": inf.datos_grafica.get("tabla_rubrica", []) if inf.datos_grafica else [],
         "payload_exportacion": payload_exportacion
     })
+
+@router.delete("/guardado/{informe_id}")
+def eliminar_informe_guardado(informe_id: int, db: Session = Depends(get_db)):
+    inf = db.query(InformeGenerado).filter_by(id=informe_id).first()
+    if inf:
+        db.delete(inf)
+        db.commit()
+    return Response(status_code=200)
+
 
 @router.post("/generar", response_class=HTMLResponse)
 def generar_informe(
@@ -146,7 +171,10 @@ def generar_informe(
             for dim_clave, val in r.calificaciones_dimensiones.items():
                 if dim_clave not in series_dims:
                     series_dims[dim_clave] = []
-                series_dims[dim_clave].append(float(val))
+                try:
+                    series_dims[dim_clave].append(float(val))
+                except (ValueError, TypeError):
+                    pass
 
         series_nombradas = {}
         if rubrica:
@@ -160,11 +188,14 @@ def generar_informe(
             series_nombradas = series_dims
 
         if fechas_str and series_nombradas:
-            grafica_base64 = ChartService.generar_grafica_individual_base64(
-                fechas=fechas_str,
-                series_dimensiones=series_nombradas,
-                nombre_rubrica=rubrica.nombre if rubrica else "Evolucion Formativa"
-            )
+            try:
+                grafica_base64 = ChartService.generar_grafica_individual_base64(
+                    fechas=fechas_str,
+                    series_dimensiones=series_nombradas,
+                    nombre_rubrica=rubrica.nombre if rubrica else "Evolucion Formativa"
+                )
+            except Exception as e:
+                print(f"Error generando grafica individual: {e}")
 
         llm = get_llm_service()
         texto_ia_bruto = llm.redactar_informe(
@@ -208,7 +239,7 @@ def generar_informe(
             for val in r.calificaciones_dimensiones.values():
                 try:
                     meses_data[mes_label].append(float(val))
-                except ValueError:
+                except (ValueError, TypeError):
                     pass
 
             observaciones_para_ia.append({
@@ -222,11 +253,14 @@ def generar_informe(
         periodos_validos = [p for p in periodos if len(meses_data[p]) > 0]
 
         if periodos_validos and distribuciones:
-            grafica_base64 = ChartService.generar_grafica_agregada_curso_base64(
-                periodos=periodos_validos,
-                distribuciones=distribuciones,
-                nombre_rubrica=rubrica.nombre if rubrica else f"Distribucion Grupal {curso.nombre}"
-            )
+            try:
+                grafica_base64 = ChartService.generar_grafica_agregada_curso_base64(
+                    periodos=periodos_validos,
+                    distribuciones=distribuciones,
+                    nombre_rubrica=rubrica.nombre if rubrica else f"Distribucion Grupal {curso.nombre}"
+                )
+            except Exception as e:
+                print(f"Error generando grafica grupal: {e}")
 
         llm = get_llm_service()
         contenido_narrativo = llm.redactar_informe(
@@ -301,4 +335,164 @@ def descargar_pdf(payload_json: str = Form(...)):
         content=pdf_bytes,
         media_type="application/pdf",
         headers={"Content-Disposition": "attachment; filename=Informe_REIA_Oficial.pdf"}
+    )
+
+@router.post("/descargar-masivo-zip")
+def descargar_masivo_zip(
+    curso_id: str = Form(""),
+    clase_id: str = Form(""),
+    rubrica_id: str = Form(""),
+    fecha_inicio: str = Form("2026-02-01"),
+    fecha_fin: str = Form("2026-11-30"),
+    formato: str = Form("docx"),
+    prompt_personalizado: str = Form(""),
+    db: Session = Depends(get_db)
+):
+    f_ini = date.fromisoformat(fecha_inicio)
+    f_fin = date.fromisoformat(fecha_fin)
+    rub_id = int(rubrica_id) if rubrica_id and rubrica_id.isdigit() else None
+    rubrica = db.query(Rubrica).filter_by(id=rub_id).first() if rub_id else None
+
+    # Obtener lista de estudiantes
+    estudiantes = []
+    nombre_grupo = "Grupo"
+    if curso_id and curso_id.isdigit():
+        curso = db.query(Curso).filter_by(id=int(curso_id)).first()
+        if curso:
+            nombre_grupo = f"Curso_{curso.nombre}"
+            estudiantes = [e for e in curso.estudiantes if e.activo]
+    elif clase_id and clase_id.isdigit():
+        clase = db.query(Clase).filter_by(id=int(clase_id)).first()
+        if clase:
+            nombre_grupo = f"Clase_{clase.nombre}"
+            estudiantes = [e for e in clase.estudiantes if e.activo]
+
+    if not estudiantes:
+        estudiantes = db.query(Estudiante).filter_by(activo=True).order_by(Estudiante.apellidos).all()
+        nombre_grupo = "Estudiantes_Todos"
+
+    zip_buffer = io.BytesIO()
+    llm = get_llm_service()
+
+    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
+        for est in estudiantes:
+            # Query reportes del estudiante
+            q = db.query(Reporte).filter(
+                Reporte.estudiante_id == est.id,
+                Reporte.fecha >= f_ini,
+                Reporte.fecha <= f_fin
+            )
+            if rub_id:
+                q = q.filter(Reporte.rubrica_id == rub_id)
+            if clase_id and clase_id.isdigit():
+                q = q.filter(Reporte.clase_id == int(clase_id))
+            reportes = q.order_by(Reporte.fecha).all()
+
+            observaciones_para_ia = []
+            fechas_str = []
+            series_dims = {}
+            tabla_rubrica = []
+
+            for r in reportes:
+                f_label = r.fecha.strftime("%d/%m")
+                fechas_str.append(f_label)
+                observaciones_para_ia.append({
+                    "fecha": r.fecha.isoformat(),
+                    "clase": r.clase.nombre if r.clase else "General",
+                    "texto": r.texto_anonimizado,
+                    "calificaciones": r.calificaciones_dimensiones
+                })
+                for dim_clave, val in r.calificaciones_dimensiones.items():
+                    if dim_clave not in series_dims:
+                        series_dims[dim_clave] = []
+                    try:
+                        series_dims[dim_clave].append(float(val))
+                    except (ValueError, TypeError):
+                        pass
+
+            series_nombradas = {}
+            if rubrica:
+                for dim in rubrica.dimensiones:
+                    if dim.clave in series_dims:
+                        series_nombradas[dim.nombre] = series_dims[dim.clave]
+                        prom = sum(series_dims[dim.clave]) / len(series_dims[dim.clave]) if series_dims[dim.clave] else 0.0
+                        nivel = "Superior" if prom >= 4.6 else ("Alto" if prom >= 4.0 else ("Basico" if prom >= 3.0 else "Bajo"))
+                        tabla_rubrica.append({"dimension": dim.nombre, "promedio": prom, "nivel": nivel})
+            else:
+                series_nombradas = series_dims
+
+            grafica_base64 = None
+            if fechas_str and series_nombradas:
+                try:
+                    grafica_base64 = ChartService.generar_grafica_individual_base64(
+                        fechas=fechas_str,
+                        series_dimensiones=series_nombradas,
+                        nombre_rubrica=rubrica.nombre if rubrica else "Evolucion Formativa"
+                    )
+                except Exception as e:
+                    print(f"Error generando grafica para {est.nombre_completo}: {e}")
+
+            if observaciones_para_ia:
+                texto_ia_bruto = llm.redactar_informe(
+                    observaciones_anonimas=observaciones_para_ia,
+                    prompt_docente=prompt_personalizado,
+                    es_individual=True
+                )
+                contenido_narrativo = PrivacyService.reemplazar_tokens_locales(texto_ia_bruto, est)
+            else:
+                contenido_narrativo = f"Durante el periodo del {fecha_inicio} al {fecha_fin}, el estudiante {est.nombre_completo} ha participado en las actividades academicas curriculares. Se recomienda mantener el acompanamiento pedagogico."
+
+            curso_est_nombre = est.cursos[0].nombre if est.cursos else nombre_grupo
+            datos_cabecera = {
+                "Estudiante": est.nombre_completo,
+                "Identificacion": f"{est.tipo_documento} {est.numero_documento}",
+                "Grado y Curso": f"{est.grado_actual} grado ({curso_est_nombre})",
+                "Edad": f"{est.edad} anos",
+                "Periodo de Evaluacion": f"{fecha_inicio} al {fecha_fin}"
+            }
+            titulo_informe = f"Informe de Evaluacion Formativa: {est.nombre_completo}"
+
+            # Guardar en BD para historial
+            nuevo_informe = InformeGenerado(
+                tipo_informe="INDIVIDUAL",
+                estudiante_id=est.id,
+                curso_id=est.cursos[0].id if est.cursos else None,
+                fecha_inicio=f_ini,
+                fecha_fin=f_fin,
+                prompt_utilizado=prompt_personalizado,
+                contenido_narrativo=contenido_narrativo,
+                datos_grafica={"grafica_base64": grafica_base64, "tabla_rubrica": tabla_rubrica}
+            )
+            db.add(nuevo_informe)
+
+            # Generar archivo
+            clean_name = f"{est.apellidos}_{est.nombres}".replace(" ", "_").replace("/", "_").replace("\\", "_")
+            if formato.lower() == "pdf":
+                doc_bytes = PdfService.generar_informe_pdf(
+                    titulo_informe=titulo_informe,
+                    datos_cabecera=datos_cabecera,
+                    contenido_ia=contenido_narrativo,
+                    grafica_base64=grafica_base64,
+                    tabla_rubrica=tabla_rubrica
+                )
+                zip_file.writestr(f"Informe_{clean_name}.pdf", doc_bytes)
+            else:
+                doc_bytes = DocxService.generar_informe_docx(
+                    titulo_informe=titulo_informe,
+                    datos_cabecera=datos_cabecera,
+                    contenido_ia=contenido_narrativo,
+                    grafica_base64=grafica_base64,
+                    tabla_rubrica=tabla_rubrica
+                )
+                zip_file.writestr(f"Informe_{clean_name}.docx", doc_bytes)
+
+        db.commit()
+
+    zip_bytes = zip_buffer.getvalue()
+    safe_grupo = nombre_grupo.replace(" ", "_").replace("/", "_")
+    ext = formato.upper()
+    return Response(
+        content=zip_bytes,
+        media_type="application/zip",
+        headers={"Content-Disposition": f"attachment; filename=Informes_{safe_grupo}_{ext}.zip"}
     )

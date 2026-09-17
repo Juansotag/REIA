@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, Text, Date, DateTime, ForeignKey, func, JSON
+from sqlalchemy.orm import relationship
 from app.database import Base
 
 class ModeloInforme(Base):
@@ -29,3 +30,10 @@ class InformeGenerado(Base):
     archivo_docx_path = Column(String(255), nullable=True)
     archivo_pdf_path = Column(String(255), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    # Relaciones
+    estudiante = relationship("Estudiante")
+    curso = relationship("Curso")
+    clase = relationship("Clase")
+    modelo = relationship("ModeloInforme")
+

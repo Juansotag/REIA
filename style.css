@@ -1009,3 +1009,50 @@ input[type="number"]:focus {
     height: auto !important;
   }
 }
+
+/* ─── Markdown Rendering en Previsualización ─── */
+.markdown-body {
+  color: var(--text-main);
+  line-height: 1.75;
+  font-size: var(--fs-md);
+}
+.markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4 {
+  color: var(--c-blue-dark);
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+.markdown-body h2 {
+  font-size: 1.25rem;
+  border-bottom: 1px solid var(--c-blue-tint);
+  padding-bottom: 0.35rem;
+}
+.markdown-body h3 {
+  font-size: 1.1rem;
+}
+.markdown-body h4 {
+  font-size: 0.95rem;
+}
+.markdown-body p {
+  margin-bottom: 0.85rem;
+}
+.markdown-body ul, .markdown-body ol {
+  margin-bottom: 0.85rem;
+  padding-left: 1.5rem;
+}
+.markdown-body li {
+  margin-bottom: 0.35rem;
+}
+.markdown-body strong {
+  color: var(--c-blue-dark);
+  font-weight: 700;
+}
+.markdown-body blockquote {
+  border-left: 4px solid var(--c-blue-soft);
+  background: var(--bg-main);
+  padding: 0.6rem 1rem;
+  margin: 0.85rem 0;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-style: italic;
+}
+

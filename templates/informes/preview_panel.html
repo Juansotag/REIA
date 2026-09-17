@@ -13,15 +13,15 @@
     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
       <form action="/informes/descargar-docx" method="POST" style="display: inline;">
         <input type="hidden" name="payload_json" value="{{ payload_exportacion }}">
-        <button type="submit" class="primary" style="background: #00387D; font-size: var(--fs-xs); padding: 0.6rem 1rem;">
+        <button type="submit" class="primary" style="background: #00387D; color: #FFFFFF !important; font-size: var(--fs-xs); padding: 0.6rem 1rem;">
           Descargar Word (.docx)
         </button>
       </form>
 
       <form action="/informes/descargar-pdf" method="POST" style="display: inline;">
         <input type="hidden" name="payload_json" value="{{ payload_exportacion }}">
-        <button type="submit" class="danger" style="background: var(--c-red); font-size: var(--fs-xs); padding: 0.6rem 1rem;">
-          Descargar PDF
+        <button type="submit" class="danger" style="background: #96272D; color: #FFFFFF !important; font-size: var(--fs-xs); padding: 0.6rem 1rem;">
+          Descargar PDF (.pdf)
         </button>
       </form>
     </div>
@@ -51,8 +51,8 @@
     <h3 style="color: var(--c-blue-dark); border-bottom: 2px solid var(--c-blue-tint); padding-bottom: 0.5rem; margin-bottom: 1rem;">
       Analisis Formativo y Recomendaciones Pedagogicas
     </h3>
-    <div style="color: var(--text-secondary); font-size: var(--fs-md); white-space: pre-line;">
-      {{ contenido_narrativo }}
+    <div class="markdown-body" style="color: var(--text-secondary); font-size: var(--fs-md);">
+      {{ contenido_narrativo | markdown | safe }}
     </div>
   </div>
 

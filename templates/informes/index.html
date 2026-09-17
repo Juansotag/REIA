@@ -5,20 +5,23 @@
 {% block content %}
 <div class="page-intro">
   <h1>Informes de Evaluación Formativa</h1>
-  <p>Generación de informes consolidados con inteligencia artificial, gráficas de evolución y consulta del historial guardado.</p>
+  <p>Generación de informes consolidados con inteligencia artificial, exportación masiva en formato ZIP y consulta del historial.</p>
 </div>
 
-<!-- Barra de Subpestañas: Generador vs Historial -->
+<!-- Barra de Subpestañas: Individual/Curso vs Masivo ZIP vs Historial -->
 <div class="subtabs-bar">
   <button type="button" class="subtab-btn active" id="tab-btn-generador" onclick="cambiarVistaInformes('generador')">
-    Generar Nuevo Informe
+    Generar Informe con Previsualización
+  </button>
+  <button type="button" class="subtab-btn" id="tab-btn-masivo" onclick="cambiarVistaInformes('masivo')">
+    Generación Masiva por Curso o Clase (ZIP)
   </button>
   <button type="button" class="subtab-btn" id="tab-btn-historial-inf" onclick="cambiarVistaInformes('historial')">
-    Historial de Informes y Modelos
+    Historial de Informes y Plantillas
   </button>
 </div>
 
-<!-- Vista 1: Generador de Nuevo Informe -->
+<!-- Vista 1: Generador de Nuevo Informe con Preview -->
 <div id="seccion-generador">
   <div class="session-layout">
     <!-- Panel de Parámetros del Informe -->
@@ -72,6 +75,7 @@
           <div class="form-group">
             <label>Rúbrica a Evaluar</label>
             <select name="rubrica_id">
+              <option value="">-- Todas las Dimensiones Registradas --</option>
               {% for r in rubricas %}
               <option value="{{ r.id }}">{{ r.nombre }} ({{ r.tipo_escala }})</option>
               {% endfor %}
@@ -124,15 +128,107 @@
       <div class="card" style="text-align: center; padding: 4rem 2rem;">
         <h3>Área de Previsualización del Informe</h3>
         <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto;">
-          Configure los parámetros en el panel izquierdo y haga clic en <strong>"Generar Informe con IA"</strong> para visualizar el reporte, la gráfica analítica y descargar en Word y PDF.
+          Configure los parámetros en el panel izquierdo y haga clic en <strong>"Generar Informe con IA"</strong> para visualizar el reporte con formato, la gráfica analítica y descargar en Word y PDF.
         </p>
       </div>
     </div>
   </div>
 </div>
 
+<!-- Vista 2: Generación Masiva por Curso/Clase en ZIP -->
+<div id="seccion-masivo" style="display: none;">
+  <div class="card" style="max-width: 800px; margin: 0 auto;">
+    <div class="card-header-row">
+      <div>
+        <h3>Generación Masiva de Informes en Paquete ZIP</h3>
+        <div class="card-description">
+          Genera automáticamente los informes individuales de todos los estudiantes de un curso o clase y descárgalos agrupados en un archivo comprimido (.zip).
+        </div>
+      </div>
+    </div>
 
-<!-- Vista 2: Historial de Informes Guardados y Modelos -->
+    <form action="/informes/descargar-masivo-zip" method="POST" onsubmit="document.getElementById('btn-submit-masivo').disabled = true; document.getElementById('spinner-masivo').style.display = 'flex';">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+        <!-- Selector Curso -->
+        <div class="form-group">
+          <label for="masivo-curso">Por Curso</label>
+          <select name="curso_id" id="masivo-curso" style="width: 100%;">
+            <option value="">-- Seleccionar Curso --</option>
+            {% for c in cursos %}
+            <option value="{{ c.id }}">{{ c.nombre }} ({{ c.grado }}º grado)</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Selector Clase / Asignatura -->
+        <div class="form-group">
+          <label for="masivo-clase">O por Asignatura / Clase</label>
+          <select name="clase_id" id="masivo-clase" style="width: 100%;">
+            <option value="">-- Seleccionar Asignatura --</option>
+            {% for cl in clases %}
+            <option value="{{ cl.id }}">{{ cl.nombre }} ({{ cl.area }})</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+        <!-- Rúbrica -->
+        <div class="form-group">
+          <label for="masivo-rubrica">Rúbrica a Aplicar</label>
+          <select name="rubrica_id" id="masivo-rubrica" style="width: 100%;">
+            <option value="">-- General / Todas las Dimensiones --</option>
+            {% for r in rubricas %}
+            <option value="{{ r.id }}">{{ r.nombre }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Formato de Descarga -->
+        <div class="form-group">
+          <label>Formato de Salida</label>
+          <div style="display: flex; gap: 1.5rem; margin-top: 0.5rem;">
+            <label style="text-transform: none; font-weight: normal; display: flex; align-items: center; gap: 0.3rem; cursor: pointer;">
+              <input type="radio" name="formato" value="docx" checked> Word (.docx)
+            </label>
+            <label style="text-transform: none; font-weight: normal; display: flex; align-items: center; gap: 0.3rem; cursor: pointer;">
+              <input type="radio" name="formato" value="pdf"> PDF (.pdf)
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fechas -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+        <div class="form-group">
+          <label>Fecha Inicial del Periodo</label>
+          <input type="date" name="fecha_inicio" value="2026-02-01" required style="width: 100%;">
+        </div>
+        <div class="form-group">
+          <label>Fecha Final del Periodo</label>
+          <input type="date" name="fecha_fin" value="2026-11-30" required style="width: 100%;">
+        </div>
+      </div>
+
+      <!-- Prompt para IA -->
+      <div class="form-group" style="margin-bottom: 1.25rem;">
+        <label>Instrucciones de Redacción para la IA</label>
+        <textarea name="prompt_personalizado" rows="3" style="width: 100%;" placeholder="Instrucciones para la redacción de cada estudiante...">Redactar informe formativo individual destacando fortalezas observadas, áreas de oportunidad y recomendaciones prácticas para docentes y acudientes.</textarea>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+        <div id="spinner-masivo" style="display: none; align-items: center; gap: 0.5rem; font-size: var(--fs-sm); color: var(--c-blue-dark);">
+          <span>Generando informes individuales y comprimiendo paquete ZIP... Este proceso puede tomar unos segundos.</span>
+        </div>
+        <button type="submit" id="btn-submit-masivo" class="primary" style="padding: 0.8rem 1.75rem; margin-left: auto;">
+          Generar y Descargar Paquete ZIP (.zip)
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Vista 3: Historial de Informes Guardados y Modelos -->
 <div id="seccion-historial-inf" style="display: none;">
   {% include "informes/historial_informes.html" %}
 </div>
@@ -158,19 +254,27 @@ function cargarPlantillaPrompt(texto) {
 
 function cambiarVistaInformes(vista) {
   const secGen = document.getElementById("seccion-generador");
+  const secMas = document.getElementById("seccion-masivo");
   const secHist = document.getElementById("seccion-historial-inf");
   const btnGen = document.getElementById("tab-btn-generador");
+  const btnMas = document.getElementById("tab-btn-masivo");
   const btnHist = document.getElementById("tab-btn-historial-inf");
+
+  secGen.style.display = "none";
+  secMas.style.display = "none";
+  secHist.style.display = "none";
+  btnGen.classList.remove("active");
+  btnMas.classList.remove("active");
+  btnHist.classList.remove("active");
 
   if (vista === "generador") {
     secGen.style.display = "block";
-    secHist.style.display = "none";
     btnGen.classList.add("active");
-    btnHist.classList.remove("active");
+  } else if (vista === "masivo") {
+    secMas.style.display = "block";
+    btnMas.classList.add("active");
   } else {
-    secGen.style.display = "none";
     secHist.style.display = "block";
-    btnGen.classList.remove("active");
     btnHist.classList.add("active");
   }
 }

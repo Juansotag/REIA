@@ -40,10 +40,19 @@ def test_anonimizacion_zero_pii():
 
 def test_reemplazo_local_tokens():
     estudiante = DummyEstudiante(1, "Juan David", "Morales Castro", genero="Masculino", pronombre="él")
-    texto_ia = "Se recomienda que [NOMBRE_ESTUDIANTE] mantenga su dedicación ya que [PRONOMBRE] tiene gran potencial."
     
-    texto_final = PrivacyService.reemplazar_tokens_locales(texto_ia, estudiante)
-    assert "Juan David Morales Castro" in texto_final
-    assert "[NOMBRE_ESTUDIANTE]" not in texto_final
-    assert "él" in texto_final
-    assert "[PRONOMBRE]" not in texto_final
+    variantes = [
+        "El estudiante [NOMBRE] demostró un gran avance.",
+        "Se recomienda que [NOMBRE_ESTUDIANTE] mantenga su dedicación ya que [PRONOMBRE] tiene gran potencial.",
+        "El informe de [Nombre del estudiante] indica buen desempeño.",
+        "Observamos que [ALUMNO] cumplió con los objetivos."
+    ]
+    
+    for v in variantes:
+        texto_final = PrivacyService.reemplazar_tokens_locales(v, estudiante)
+        assert "Juan David Morales Castro" in texto_final
+        assert "[NOMBRE]" not in texto_final
+        assert "[NOMBRE_ESTUDIANTE]" not in texto_final
+        assert "[Nombre del estudiante]" not in texto_final
+        assert "[ALUMNO]" not in texto_final
+

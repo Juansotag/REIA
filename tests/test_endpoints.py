@@ -159,3 +159,48 @@ def test_pagina_configuracion_y_env():
     assert res_guardar.status_code == 200
     assert "guardada de forma segura en .env" in res_guardar.text
 
+def test_descarga_masiva_zip_docx_y_pdf():
+    import zipfile
+    import io
+
+    # Test masivo docx
+    res_docx = client.post("/informes/descargar-masivo-zip", data={
+        "curso_id": "1",
+        "formato": "docx",
+        "fecha_inicio": "2026-02-01",
+        "fecha_fin": "2026-11-30"
+    })
+    assert res_docx.status_code == 200
+    assert res_docx.headers["content-type"] == "application/zip"
+    zf_docx = zipfile.ZipFile(io.BytesIO(res_docx.content))
+    assert len(zf_docx.namelist()) > 0
+    assert any(name.endswith(".docx") for name in zf_docx.namelist())
+
+    # Test masivo pdf
+    res_pdf = client.post("/informes/descargar-masivo-zip", data={
+        "curso_id": "1",
+        "formato": "pdf",
+        "fecha_inicio": "2026-02-01",
+        "fecha_fin": "2026-11-30"
+    })
+    assert res_pdf.status_code == 200
+    assert res_pdf.headers["content-type"] == "application/zip"
+    zf_pdf = zipfile.ZipFile(io.BytesIO(res_pdf.content))
+    assert len(zf_pdf.namelist()) > 0
+    assert any(name.endswith(".pdf") for name in zf_pdf.namelist())
+
+def test_eliminar_informe_guardado():
+    from app.database import SessionLocal
+    from app.models import InformeGenerado
+    db = SessionLocal()
+    inf = db.query(InformeGenerado).first()
+    if inf:
+        inf_id = inf.id
+        db.close()
+        res = client.delete(f"/informes/guardado/{inf_id}")
+        assert res.status_code == 200
+    else:
+        db.close()
+
+
+

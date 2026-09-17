@@ -61,19 +61,43 @@
             {% for dim in rubrica.dimensiones %}
             <div class="dim-card" style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.85rem;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                <strong style="color: var(--c-blue-dark); font-size: var(--fs-sm);">Dimensión</strong>
+                <strong style="color: var(--c-blue-dark); font-size: var(--fs-sm);">Dimensión {{ loop.index }}</strong>
                 <button type="button" class="danger" style="padding: 0.2rem 0.45rem; font-size: 0.7rem;" onclick="this.closest('.dim-card').remove()">Eliminar</button>
               </div>
               <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 0.5rem; margin-bottom: 0.5rem;">
-                <input type="text" name="dim_nombre[]" value="{{ dim.nombre }}" placeholder="Nombre de la dimensión" required style="font-size: var(--fs-sm);">
-                <input type="text" name="dim_clave[]" value="{{ dim.clave }}" placeholder="clave_tecnica" required style="font-size: var(--fs-sm);">
-                <input type="number" name="dim_peso[]" value="{{ dim.peso_porcentual }}" placeholder="Peso %" min="0" max="100" style="font-size: var(--fs-sm);">
+                <div>
+                  <label style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 2px;">Nombre del Criterio</label>
+                  <input type="text" name="dim_nombre[]" value="{{ dim.nombre }}" placeholder="Ej. Pensamiento Lógico" required style="font-size: var(--fs-sm); width: 100%;">
+                </div>
+                <div>
+                  <label style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 2px;">Clave Técnica (IA)</label>
+                  <input type="text" name="dim_clave[]" value="{{ dim.clave }}" placeholder="dim_1" required style="font-size: var(--fs-sm); width: 100%;">
+                </div>
+                <div>
+                  <label style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 2px;">Peso (%)</label>
+                  <input type="number" name="dim_peso[]" value="{{ dim.peso_porcentual }}" placeholder="35" min="0" max="100" style="font-size: var(--fs-sm); width: 100%;">
+                </div>
+              </div>
+              <div style="margin-top: 0.35rem; margin-bottom: 0.25rem;">
+                <span style="font-size: 0.72rem; font-weight: 600; color: var(--c-blue-dark);">Descriptores por Nivel de Desempeño:</span>
               </div>
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; font-size: var(--fs-xs);">
-                <input type="text" name="dim_bajo[]" value="{{ dim.descriptor_bajo or '' }}" placeholder="Descriptor Bajo (0.0 - 2.9)">
-                <input type="text" name="dim_basico[]" value="{{ dim.descriptor_basico or '' }}" placeholder="Descriptor Básico (3.0 - 3.9)">
-                <input type="text" name="dim_alto[]" value="{{ dim.descriptor_alto or '' }}" placeholder="Descriptor Alto (4.0 - 4.5)">
-                <input type="text" name="dim_superior[]" value="{{ dim.descriptor_superior or '' }}" placeholder="Descriptor Superior (4.6 - 5.0)">
+                <div>
+                  <label style="font-size: 0.7rem; color: #dc2626; display: block; margin-bottom: 2px;">Bajo (0.0 - 2.9)</label>
+                  <input type="text" name="dim_bajo[]" value="{{ dim.descriptor_bajo or '' }}" placeholder="Dificultades en..." style="width: 100%;">
+                </div>
+                <div>
+                  <label style="font-size: 0.7rem; color: #d97706; display: block; margin-bottom: 2px;">Básico (3.0 - 3.9)</label>
+                  <input type="text" name="dim_basico[]" value="{{ dim.descriptor_basico or '' }}" placeholder="Cumple con lo básico..." style="width: 100%;">
+                </div>
+                <div>
+                  <label style="font-size: 0.7rem; color: #2563eb; display: block; margin-bottom: 2px;">Alto (4.0 - 4.5)</label>
+                  <input type="text" name="dim_alto[]" value="{{ dim.descriptor_alto or '' }}" placeholder="Estructura sólida..." style="width: 100%;">
+                </div>
+                <div>
+                  <label style="font-size: 0.7rem; color: #16a34a; display: block; margin-bottom: 2px;">Superior (4.6 - 5.0)</label>
+                  <input type="text" name="dim_superior[]" value="{{ dim.descriptor_superior or '' }}" placeholder="Excelente dominio..." style="width: 100%;">
+                </div>
               </div>
             </div>
             {% endfor %}
@@ -85,15 +109,39 @@
                 <button type="button" class="danger" style="padding: 0.2rem 0.45rem; font-size: 0.7rem;" onclick="this.closest('.dim-card').remove()">Eliminar</button>
               </div>
               <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 0.5rem; margin-bottom: 0.5rem;">
-                <input type="text" name="dim_nombre[]" placeholder="Nombre (ej. Claridad Argumentativa)" required style="font-size: var(--fs-sm);">
-                <input type="text" name="dim_clave[]" placeholder="clave (ej. dim_claridad)" required style="font-size: var(--fs-sm);">
-                <input type="number" name="dim_peso[]" value="50" placeholder="Peso %" min="0" max="100" style="font-size: var(--fs-sm);">
+                <div>
+                  <label style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 2px;">Nombre del Criterio</label>
+                  <input type="text" name="dim_nombre[]" placeholder="Ej. Claridad Argumentativa" required style="font-size: var(--fs-sm); width: 100%;">
+                </div>
+                <div>
+                  <label style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 2px;">Clave Técnica (IA)</label>
+                  <input type="text" name="dim_clave[]" placeholder="dim_claridad" required style="font-size: var(--fs-sm); width: 100%;">
+                </div>
+                <div>
+                  <label style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 2px;">Peso (%)</label>
+                  <input type="number" name="dim_peso[]" value="50" placeholder="50" min="0" max="100" style="font-size: var(--fs-sm); width: 100%;">
+                </div>
+              </div>
+              <div style="margin-top: 0.35rem; margin-bottom: 0.25rem;">
+                <span style="font-size: 0.72rem; font-weight: 600; color: var(--c-blue-dark);">Descriptores por Nivel de Desempeño:</span>
               </div>
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; font-size: var(--fs-xs);">
-                <input type="text" name="dim_bajo[]" placeholder="Descriptor Bajo (0.0 - 2.9)">
-                <input type="text" name="dim_basico[]" placeholder="Descriptor Básico (3.0 - 3.9)">
-                <input type="text" name="dim_alto[]" placeholder="Descriptor Alto (4.0 - 4.5)">
-                <input type="text" name="dim_superior[]" placeholder="Descriptor Superior (4.6 - 5.0)">
+                <div>
+                  <label style="font-size: 0.7rem; color: #dc2626; display: block; margin-bottom: 2px;">Bajo (0.0 - 2.9)</label>
+                  <input type="text" name="dim_bajo[]" placeholder="Descriptor Bajo (0.0 - 2.9)" style="width: 100%;">
+                </div>
+                <div>
+                  <label style="font-size: 0.7rem; color: #d97706; display: block; margin-bottom: 2px;">Básico (3.0 - 3.9)</label>
+                  <input type="text" name="dim_basico[]" placeholder="Descriptor Básico (3.0 - 3.9)" style="width: 100%;">
+                </div>
+                <div>
+                  <label style="font-size: 0.7rem; color: #2563eb; display: block; margin-bottom: 2px;">Alto (4.0 - 4.5)</label>
+                  <input type="text" name="dim_alto[]" placeholder="Descriptor Alto (4.0 - 4.5)" style="width: 100%;">
+                </div>
+                <div>
+                  <label style="font-size: 0.7rem; color: #16a34a; display: block; margin-bottom: 2px;">Superior (4.6 - 5.0)</label>
+                  <input type="text" name="dim_superior[]" placeholder="Descriptor Superior (4.6 - 5.0)" style="width: 100%;">
+                </div>
               </div>
             </div>
           {% endif %}
@@ -130,15 +178,39 @@ function agregarFilaDimension() {
       <button type="button" class="danger" style="padding: 0.2rem 0.45rem; font-size: 0.7rem;" onclick="this.closest('.dim-card').remove()">Eliminar</button>
     </div>
     <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 0.5rem; margin-bottom: 0.5rem;">
-      <input type="text" name="dim_nombre[]" placeholder="Nombre de la dimensión" required style="font-size: var(--fs-sm);">
-      <input type="text" name="dim_clave[]" placeholder="clave_${count}" required style="font-size: var(--fs-sm);">
-      <input type="number" name="dim_peso[]" value="25" placeholder="Peso %" min="0" max="100" style="font-size: var(--fs-sm);">
+      <div>
+        <label style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 2px;">Nombre del Criterio</label>
+        <input type="text" name="dim_nombre[]" placeholder="Nombre de la dimensión" required style="font-size: var(--fs-sm); width: 100%;">
+      </div>
+      <div>
+        <label style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 2px;">Clave Técnica (IA)</label>
+        <input type="text" name="dim_clave[]" placeholder="clave_${count}" required style="font-size: var(--fs-sm); width: 100%;">
+      </div>
+      <div>
+        <label style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 2px;">Peso (%)</label>
+        <input type="number" name="dim_peso[]" value="25" placeholder="Peso %" min="0" max="100" style="font-size: var(--fs-sm); width: 100%;">
+      </div>
+    </div>
+    <div style="margin-top: 0.35rem; margin-bottom: 0.25rem;">
+      <span style="font-size: 0.72rem; font-weight: 600; color: var(--c-blue-dark);">Descriptores por Nivel de Desempeño:</span>
     </div>
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; font-size: var(--fs-xs);">
-      <input type="text" name="dim_bajo[]" placeholder="Descriptor Bajo (0.0 - 2.9)">
-      <input type="text" name="dim_basico[]" placeholder="Descriptor Básico (3.0 - 3.9)">
-      <input type="text" name="dim_alto[]" placeholder="Descriptor Alto (4.0 - 4.5)">
-      <input type="text" name="dim_superior[]" placeholder="Descriptor Superior (4.6 - 5.0)">
+      <div>
+        <label style="font-size: 0.7rem; color: #dc2626; display: block; margin-bottom: 2px;">Bajo (0.0 - 2.9)</label>
+        <input type="text" name="dim_bajo[]" placeholder="Descriptor Bajo (0.0 - 2.9)" style="width: 100%;">
+      </div>
+      <div>
+        <label style="font-size: 0.7rem; color: #d97706; display: block; margin-bottom: 2px;">Básico (3.0 - 3.9)</label>
+        <input type="text" name="dim_basico[]" placeholder="Descriptor Básico (3.0 - 3.9)" style="width: 100%;">
+      </div>
+      <div>
+        <label style="font-size: 0.7rem; color: #2563eb; display: block; margin-bottom: 2px;">Alto (4.0 - 4.5)</label>
+        <input type="text" name="dim_alto[]" placeholder="Descriptor Alto (4.0 - 4.5)" style="width: 100%;">
+      </div>
+      <div>
+        <label style="font-size: 0.7rem; color: #16a34a; display: block; margin-bottom: 2px;">Superior (4.6 - 5.0)</label>
+        <input type="text" name="dim_superior[]" placeholder="Descriptor Superior (4.6 - 5.0)" style="width: 100%;">
+      </div>
     </div>
   `;
   cont.appendChild(div);
