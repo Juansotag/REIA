@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}Reportes y Bitácora - REIA GovLab{% endblock %}
+
+{% block content %}
+<div class="page-intro">
+  <h1>Bitácora de Observaciones y Reportes</h1>
+  <p>Consulta del histórico de reportes registrados y modo rápido para captura secuencial por voz.</p>
+</div>
+
+<!-- Barra de Subpestañas: Historial vs Modo Rápido -->
+<div class="subtabs-bar">
+  <button type="button" class="subtab-btn {% if vista_activa != 'rafaga' %}active{% endif %}" id="tab-btn-historial" onclick="cambiarVistaReportes('historial')">
+    Historial de Reportes
+  </button>
+  <button type="button" class="subtab-btn {% if vista_activa == 'rafaga' %}active{% endif %}" id="tab-btn-rafaga" onclick="cambiarVistaReportes('rafaga')">
+    Nuevo Reporte: Modo Rápido (Voz)
+  </button>
+</div>
+
+<!-- Vista 1: Historial de Reportes Guardados -->
+<div id="seccion-historial" style="{% if vista_activa == 'rafaga' %}display: none;{% endif %}">
+  <div class="card">
+    <div class="card-header-row">
+      <div>
+        <h2>Histórico de Observaciones Registradas</h2>
+        <div class="card-description">Filtre y consulte las bitácoras docentes almacenadas en la base de datos.</div>
+      </div>
+    </div>
+
+    <!-- Filtros de Búsqueda en Historial -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.25rem;">
+      <div class="form-group">
+        <label>Filtrar por Curso</label>
+        <select id="hist-curso" name="curso_id"
+                hx-get="/reportes/historial-tabla"
+                hx-target="#tabla-historial-reportes"
+                hx-trigger="change"
+                hx-include="#hist-clase, #hist-buscar">
+          <option value="">Todos los cursos</option>
+          {% for c in cursos %}
+          <option value="{{ c.id }}">{{ c.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Filtrar por Clase</label>
+        <select id="hist-clase" name="clase_id"
+                hx-get="/reportes/historial-tabla"
+                hx-target="#tabla-historial-reportes"
+                hx-trigger="change"
+                hx-include="#hist-curso, #hist-buscar">
+          <option value="">Todas las clases</option>
+          {% for cl in clases %}
+          <option value="{{ cl.id }}">{{ cl.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Buscar en Texto o Estudiante</label>
+        <input type="text" id="hist-buscar" name="q" placeholder="Escriba palabra clave o nombre..."
+               hx-get="/reportes/historial-tabla"
+               hx-target="#tabla-historial-reportes"
+               hx-trigger="keyup changed delay:350ms"
+               hx-include="#hist-curso, #hist-clase">
+      </div>
+    </div>
+
+    <!-- Contenedor Dinámico de Tabla de Historial -->
+    <div id="tabla-historial-reportes">
+      {% include "reportes/historial_tabla.html" %}
+    </div>
+  </div>
+</div>
+
+<!-- Vista 2: Modo Rápido (Dictado por Voz y Ráfaga) -->
+<div id="seccion-rafaga" style="{% if vista_activa != 'rafaga' %}display: none;{% endif %}">
+  <div class="card" style="margin-bottom: 1.5rem;">
+    <div class="card-header-row">
+      <div>
+        <h2>Configurar Sesión de Dictado</h2>
+        <div class="card-description">Seleccione el grupo y la rúbrica para iniciar la evaluación alumno por alumno.</div>
+      </div>
+      <span class="resultado-badge acuerdo">Modo Rápido Activo</span>
+    </div>
+
+    <form id="form-config-sesion"
+          hx-get="/reportes/modo-rafaga"
+          hx-target="#contenedor-rafaga"
+          hx-trigger="change">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+        <div class="form-group">
+          <label>Curso a Evaluar</label>
+          <select name="curso_id" id="sel-curso" required>
+            <option value="">Seleccione Curso...</option>
+            {% for c in cursos %}
+            <option value="{{ c.id }}" {% if curso_sel and curso_sel.id == c.id %}selected{% endif %}>
+              {{ c.nombre }} ({{ c.grado }}º grado)
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Clase / Asignatura</label>
+          <select name="clase_id" id="sel-clase" required>
+            {% for cl in clases %}
+            <option value="{{ cl.id }}" {% if clase_sel and clase_sel.id == cl.id %}selected{% endif %}>
+              {{ cl.nombre }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Rúbrica de Apoyo</label>
+          <select name="rubrica_id" id="sel-rubrica">
+            {% for r in rubricas %}
+            <option value="{{ r.id }}" {% if rubrica_sel and rubrica_sel.id == r.id %}selected{% endif %}>
+              {{ r.nombre }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Fecha de la Observación</label>
+          <input type="date" name="fecha" value="{{ fecha_hoy }}" required>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div id="contenedor-rafaga">
+    {% if estudiante_actual %}
+      {% include "reportes/tarjeta_rafaga.html" %}
+    {% else %}
+      <div class="card" style="text-align: center; padding: 3rem;">
+
+        <h3>Listo para iniciar evaluacion</h3>
+        <p style="color: var(--text-muted);">
+          Seleccione el curso y la clase en el panel superior para cargar la lista de estudiantes e iniciar el dictado.
+        </p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+function cambiarVistaReportes(vista) {
+  const secHist = document.getElementById("seccion-historial");
+  const secRaf = document.getElementById("seccion-rafaga");
+  const btnHist = document.getElementById("tab-btn-historial");
+  const btnRaf = document.getElementById("tab-btn-rafaga");
+
+  if (vista === "historial") {
+    secHist.style.display = "block";
+    secRaf.style.display = "none";
+    btnHist.classList.add("active");
+    btnRaf.classList.remove("active");
+  } else {
+    secHist.style.display = "none";
+    secRaf.style.display = "block";
+    btnHist.classList.remove("active");
+    btnRaf.classList.add("active");
+  }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,96 @@
+<div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem;">
+  <!-- Seccion de Informes Guardados -->
+  <div class="card">
+    <div class="card-header-row">
+      <div>
+        <h3>Informes Generados Recientes ({{ informes_guardados|length }})</h3>
+        <div class="card-description">Haga clic en 'Ver Informe' para consultar el informe generado con su grafica y redescargar Word o PDF.</div>
+      </div>
+    </div>
+
+    <div class="data-table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Fecha Generacion</th>
+            <th>Tipo</th>
+            <th>Destinatario / Sujeto</th>
+            <th>Periodo Evaluado</th>
+            <th style="text-align: right;">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for inf in informes_guardados %}
+          <tr>
+            <td style="font-size: var(--fs-xs); color: var(--text-secondary); white-space: nowrap;">
+              {{ inf.created_at.strftime("%d/%m/%Y %H:%M") if inf.created_at else "Reciente" }}
+            </td>
+            <td>
+              <span class="resultado-badge {% if inf.tipo_informe == 'INDIVIDUAL' %}acuerdo{% else %}aplazamiento{% endif %}">
+                {{ inf.tipo_informe }}
+              </span>
+            </td>
+            <td style="font-weight: 600; color: var(--c-blue-dark);">
+              {% if inf.tipo_informe == 'INDIVIDUAL' and inf.estudiante_id %}
+                Estudiante ID: {{ inf.estudiante_id }}
+              {% elif inf.curso_id %}
+                Curso ID: {{ inf.curso_id }}
+              {% else %}
+                Institucional
+              {% endif %}
+            </td>
+            <td style="font-size: var(--fs-xs); color: var(--text-muted);">
+              {{ inf.fecha_inicio }} al {{ inf.fecha_fin }}
+            </td>
+            <td style="text-align: right; white-space: nowrap;">
+              <button class="primary" style="padding: 0.35rem 0.8rem; font-size: var(--fs-xs);"
+                      hx-get="/informes/ver-guardado/{{ inf.id }}"
+                      hx-target="#panel-preview"
+                      hx-swap="innerHTML">
+                Ver Informe
+              </button>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="5" style="padding: 2rem; text-align: center; color: var(--text-muted);">
+              No hay informes guardados previamente. Genere un informe en la pestana 'Generar Nuevo Informe' para guardarlo automaticamente.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Seccion de Modelos y Plantillas de Informe -->
+  <div class="card">
+    <div class="card-header-row">
+      <div>
+        <h3>Modelos y Plantillas de Informe Preconfiguradas</h3>
+        <div class="card-description">Plantillas pedagogicas disenadas por el GovLab para agilizar la redaccion.</div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem;">
+      {% for m in modelos %}
+      <div class="coaching-item" style="border-left-color: var(--c-blue-dark); margin-bottom: 0;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
+          <strong style="color: var(--c-blue-dark);">{{ m.nombre }}</strong>
+          <span class="resultado-badge acuerdo" style="font-size: 0.7rem;">{{ m.tipo_informe }}</span>
+        </div>
+        <p style="font-size: var(--fs-sm); color: var(--text-secondary); margin-bottom: 0.6rem;">
+          {{ m.descripcion }}
+        </p>
+        <div style="background: #fff; padding: 0.6rem; border-radius: 4px; font-size: var(--fs-xs); color: var(--text-muted); border: 1px solid var(--border-color); margin-bottom: 0.6rem; font-style: italic;">
+          "{{ m.prompt_base }}"
+        </div>
+        <button type="button" class="secondary" style="font-size: var(--fs-xs); padding: 0.35rem 0.8rem; width: 100%;"
+                onclick="aplicarPlantilla('{{ m.tipo_informe }}', '{{ m.prompt_base | replace('\'', '\\\'') | replace('\"', '\\\"') }}')">
+          Usar esta Plantilla
+        </button>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>

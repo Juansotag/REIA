@@ -1,0 +1,41 @@
+<div class="modal-overlay" onclick="if(event.target===this) this.remove()">
+  <div class="modal-box" style="max-width: 500px;">
+    <div class="modal-header">
+      <h3>{% if curso %}Editar Curso{% else %}Nuevo Curso / Cohorte{% endif %}</h3>
+      <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">x</button>
+    </div>
+
+    <form method="post" action="{% if curso %}/cursos-clases/curso/{{ curso.id }}{% else %}/cursos-clases/curso{% endif %}">
+      <div class="form-group" style="margin-bottom: 0.85rem;">
+        <label for="nombre_curso" style="font-weight: 700; color: var(--c-blue-dark); font-size: var(--fs-sm);">Nombre del Curso</label>
+        <input type="text" id="nombre_curso" name="nombre" value="{{ curso.nombre if curso else '' }}" placeholder="ej. Noveno A" required style="width: 100%;">
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
+        <div class="form-group">
+          <label for="grado_curso" style="font-weight: 700; color: var(--c-blue-dark); font-size: var(--fs-sm);">Grado Escolar (1 a 11)</label>
+          <input type="number" id="grado_curso" name="grado" min="1" max="11" value="{{ curso.grado if curso else 9 }}" required style="width: 100%;">
+        </div>
+        <div class="form-group">
+          <label for="seccion_curso" style="font-weight: 700; color: var(--c-blue-dark); font-size: var(--fs-sm);">Sección / Grupo</label>
+          <input type="text" id="seccion_curso" name="seccion" maxlength="5" value="{{ curso.seccion if curso else 'A' }}" placeholder="A, B..." required style="width: 100%;">
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 0.85rem;">
+        <label for="director_curso" style="font-weight: 700; color: var(--c-blue-dark); font-size: var(--fs-sm);">Director o Titular de Curso</label>
+        <input type="text" id="director_curso" name="director_curso" value="{{ curso.director_curso if curso else '' }}" placeholder="ej. Lic. Alejandro Gómez" style="width: 100%;">
+      </div>
+
+      <div class="form-group" style="margin-bottom: 1.25rem;">
+        <label for="anio_lectivo" style="font-weight: 700; color: var(--c-blue-dark); font-size: var(--fs-sm);">Año Lectivo</label>
+        <input type="number" id="anio_lectivo" name="anio_lectivo" value="{{ curso.anio_lectivo if curso else 2026 }}" required style="width: 100%;">
+      </div>
+
+      <div class="modal-actions" style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+        <button type="button" class="ghost" onclick="this.closest('.modal-overlay').remove()">Cancelar</button>
+        <button type="submit" class="primary">{% if curso %}Actualizar Curso{% else %}Crear Curso{% endif %}</button>
+      </div>
+    </form>
+  </div>
+</div>

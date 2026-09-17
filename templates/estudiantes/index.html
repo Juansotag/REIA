@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Estudiantes - REIA GovLab{% endblock %}
+
+{% block content %}
+<div class="page-intro">
+  <h1>Directorio de Estudiantes</h1>
+  <p>Gestión de matrícula escolar y resguardo seguro de identidad bajo estricto protocolo de privacidad Zero-PII.</p>
+</div>
+
+<div class="card">
+  <div class="card-header-row">
+    <div>
+      <h2>Nómina Escolar ({{ total_estudiantes }} estudiantes activos)</h2>
+      <div class="card-description">Los datos sensibles solo residen aquí y nunca se envían a la IA externa.</div>
+    </div>
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+      <button class="primary" hx-get="/estudiantes/modal-crear" hx-target="#modal-container" hx-swap="innerHTML">
+        + Nuevo Estudiante
+      </button>
+      <button class="secondary" hx-get="/estudiantes/modal-importar" hx-target="#modal-container" hx-swap="innerHTML">
+        Importar Excel/CSV
+      </button>
+      <a href="/estudiantes/exportar" class="nav-pill" style="color: var(--c-blue-dark); background: var(--c-blue-tint); display: inline-flex; align-items: center;">
+        Exportar Nómina
+      </a>
+    </div>
+  </div>
+
+  <!-- Filtros Rápidos -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+    <div class="form-group">
+      <label for="filtro-curso">Filtrar por Curso</label>
+      <select id="filtro-curso" name="curso_id"
+              hx-get="/estudiantes/tabla"
+              hx-target="#tabla-estudiantes"
+              hx-trigger="change"
+              hx-include="#filtro-buscar">
+        <option value="">Todos los cursos</option>
+        {% for c in cursos %}
+        <option value="{{ c.id }}">{{ c.nombre }} ({{ c.grado }}º grado)</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="filtro-buscar">Búsqueda rápida</label>
+      <input type="text" id="filtro-buscar" name="q" placeholder="Buscar por nombre o documento..."
+             hx-get="/estudiantes/tabla"
+             hx-target="#tabla-estudiantes"
+             hx-trigger="keyup changed delay:300ms"
+             hx-include="#filtro-curso">
+    </div>
+  </div>
+
+  <!-- Contenedor dinámico de la tabla -->
+  <div id="tabla-estudiantes">
+    {% include "estudiantes/tabla.html" %}
+  </div>
+</div>
+{% endblock %}

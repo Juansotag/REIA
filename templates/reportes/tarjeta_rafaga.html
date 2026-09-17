@@ -1,0 +1,120 @@
+<div class="card" id="tarjeta-estudiante-activa" style="border: 2px solid var(--c-blue-tint);">
+  <input type="hidden" id="current-curso-id" value="{{ curso.id }}">
+  <input type="hidden" id="current-clase-id" value="{{ clase.id }}">
+  <input type="hidden" id="current-rubrica-id" value="{{ rubrica.id if rubrica else '' }}">
+  <input type="hidden" id="current-index" value="{{ index_actual }}">
+
+  <!-- Cabecera de la Tarjeta del Estudiante -->
+  <div class="card-header-row" style="margin-bottom: 1rem;">
+    <div>
+      <span class="resultado-badge aplazamiento" style="margin-bottom: 0.3rem;">
+        Estudiante {{ index_actual + 1 }} de {{ total_estudiantes }}
+      </span>
+      <h2 style="color: var(--c-blue-dark); margin: 0;">
+        {{ estudiante.nombre_completo }}
+        <span style="font-size: var(--fs-sm); font-weight: normal; color: var(--text-muted);">
+          ({{ estudiante.tipo_documento }} {{ estudiante.numero_documento }} - {{ estudiante.pronombre }})
+        </span>
+      </h2>
+      <div style="font-size: var(--fs-xs); color: var(--text-muted); margin-top: 0.2rem;">
+        Curso: <strong>{{ curso.nombre }}</strong> - Clase: <strong>{{ clase.nombre }}</strong>
+      </div>
+    </div>
+
+    <div>
+      <button class="ghost" style="font-size: var(--fs-xs);"
+              hx-get="/reportes/modo-rafaga?curso_id={{ curso.id }}&clase_id={{ clase.id }}&rubrica_id={{ rubrica.id if rubrica else '' }}&fecha={{ fecha }}&index={{ index_actual + 1 }}"
+              hx-target="#contenedor-rafaga">
+        Saltar / Omitir
+      </button>
+    </div>
+  </div>
+
+  <form id="form-reporte-actual"
+        hx-post="/reportes/guardar-avanzar"
+        hx-target="#contenedor-rafaga">
+    
+    <input type="hidden" name="estudiante_id" value="{{ estudiante.id }}">
+    <input type="hidden" name="curso_id" value="{{ curso.id }}">
+    <input type="hidden" name="clase_id" value="{{ clase.id }}">
+    <input type="hidden" name="rubrica_id" value="{{ rubrica.id if rubrica else '' }}">
+    <input type="hidden" name="fecha" value="{{ fecha }}">
+    <input type="hidden" name="index_actual" value="{{ index_actual }}">
+
+    <!-- Boton de Microfono / Grabacion de Voz -->
+    <div style="text-align: center; margin-bottom: 1rem;">
+      <button type="button" id="record-btn" class="primary" style="width: 100%; max-width: 450px; font-size: 1.05rem; padding: 0.85rem;">
+        Dictar Observacion (Hablar)
+      </button>
+      <div id="stt-status" class="status-line" style="justify-content: center;">
+        Presione el boton para hablar, o escriba en el cuadro inferior.
+      </div>
+    </div>
+
+    <!-- Caja de Texto de Observacion -->
+    <div class="form-group">
+      <label for="texto-observacion">Observacion Docente</label>
+      <textarea id="texto-observacion" name="texto_original" rows="3"
+                placeholder="Hable por el microfono o escriba aqui la observacion sobre el estudiante..."
+                oninput="buscarChiclets(this.value)" required></textarea>
+    </div>
+
+    <!-- Contenedor dinamico de Chiclets (Nombres detectados de companeros) -->
+    <div id="chiclets-container"></div>
+
+    <!-- Rubrica y Calificaciones de Dimensiones -->
+    {% if rubrica %}
+    <div style="background: var(--bg-main); border: 1.5px solid var(--c-blue-tint); border-radius: var(--radius-sm); padding: 1.25rem; margin: 1.25rem 0;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div>
+          <h4 style="margin: 0; color: var(--c-blue-dark);">Rubrica: {{ rubrica.nombre }}</h4>
+          <span style="font-size: var(--fs-xs); color: var(--text-muted);">Calificacion en escala colombiana (0.0 a 5.0)</span>
+        </div>
+        <button type="button" class="secondary" style="font-size: var(--fs-xs); padding: 0.4rem 0.8rem;"
+                hx-post="/reportes/interpretar-audio"
+                hx-include="#form-reporte-actual"
+                hx-target="#dimensiones-calificacion"
+                hx-swap="innerHTML">
+          Sugerir con IA segun comentario
+        </button>
+      </div>
+
+      <!-- Dimensiones Calificables -->
+      <div id="dimensiones-calificacion" style="display: flex; flex-direction: column; gap: 1rem;">
+        {% for dim in rubrica.dimensiones %}
+        <div style="background: #fff; padding: 0.85rem; border-radius: 6px; border: 1px solid var(--border-color);">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
+            <strong style="font-size: var(--fs-sm); color: var(--c-blue-dark);">{{ dim.nombre }}</strong>
+            <span id="label-val-{{ dim.clave }}" style="font-weight: 700; color: var(--c-blue-light); font-size: var(--fs-base);">4.0</span>
+          </div>
+          <input type="range" name="dim_{{ dim.clave }}" id="range-{{ dim.clave }}"
+                 min="0.0" max="5.0" step="0.1" value="4.0"
+                 style="width: 100%; accent-color: var(--c-blue-dark);"
+                 oninput="document.getElementById('label-val-{{ dim.clave }}').innerText = parseFloat(this.value).toFixed(1)">
+          <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem;">
+            <span>0.0 (Bajo)</span>
+            <span>3.0 (Basico)</span>
+            <span>4.0 (Alto)</span>
+            <span>5.0 (Superior)</span>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Acciones Finales -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+      <button type="button" class="ghost"
+              hx-get="/reportes/modo-rafaga?curso_id={{ curso.id }}&clase_id={{ clase.id }}&rubrica_id={{ rubrica.id if rubrica else '' }}&fecha={{ fecha }}&index={{ index_actual - 1 }}"
+              hx-target="#contenedor-rafaga"
+              {% if index_actual == 0 %}disabled{% endif %}>
+        Anterior
+      </button>
+
+      <button type="submit" class="primary" style="padding: 0.75rem 2rem; font-size: 1.05rem;">
+        Guardar y Siguiente
+      </button>
+    </div>
+  </form>
+</div>

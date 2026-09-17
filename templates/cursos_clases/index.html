@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}Cursos y Clases - REIA GovLab{% endblock %}
+
+{% block content %}
+<div class="page-intro">
+  <h1>Gestión de Cursos y Clases</h1>
+  <p>Estructuración de cohortes de grado, sección y asignaturas curriculares de la institución.</p>
+</div>
+
+<div class="session-layout">
+  <!-- Panel Lateral: Listado de Cursos y Clases -->
+  <div>
+    <div class="card">
+      <div class="card-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <h3 style="margin: 0;">Cursos</h3>
+        <button type="button" class="primary" style="padding: 0.3rem 0.6rem; font-size: var(--fs-xs);"
+                hx-get="/cursos-clases/modal-curso"
+                hx-target="#modal-container"
+                hx-swap="innerHTML">
+          + Nuevo Curso
+        </button>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        {% for c in cursos %}
+        <a href="/cursos-clases?curso_id={{ c.id }}"
+           class="nav-pill {% if curso_activo and curso_activo.id == c.id %}active{% endif %}"
+           style="justify-content: space-between; display: flex; color: inherit; padding: 0.6rem 0.9rem;">
+          <span>{{ c.nombre }}</span>
+          <span style="font-size: var(--fs-xs); opacity: 0.8;">{{ c.estudiantes|length }} est.</span>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 1rem;">
+      <div class="card-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <h3 style="margin: 0;">Asignaturas</h3>
+        <button type="button" class="primary" style="padding: 0.3rem 0.6rem; font-size: var(--fs-xs);"
+                hx-get="/cursos-clases/modal-clase"
+                hx-target="#modal-container"
+                hx-swap="innerHTML">
+          + Nueva Asignatura
+        </button>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        {% for cl in clases %}
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; border-bottom: 1px solid var(--border-color); font-size: var(--fs-sm);">
+          <div>
+            <strong>{{ cl.nombre }}</strong>
+            <div style="color: var(--text-muted); font-size: var(--fs-xs);">
+              {{ cl.area }} &bull; {{ cl.estudiantes|length }} inscritos
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.25rem;">
+            <button type="button" class="secondary" style="padding: 0.2rem 0.45rem; font-size: 0.7rem;"
+                    hx-get="/cursos-clases/clase/{{ cl.id }}/modal-estudiantes"
+                    hx-target="#modal-container"
+                    hx-swap="innerHTML"
+                    title="Asignar o editar estudiantes de esta clase">
+              Estudiantes
+            </button>
+            <button type="button" class="ghost" style="padding: 0.2rem 0.45rem; font-size: 0.7rem;"
+                    hx-get="/cursos-clases/modal-clase/{{ cl.id }}"
+                    hx-target="#modal-container"
+                    hx-swap="innerHTML">
+              Editar
+            </button>
+            <button type="button" class="danger" style="padding: 0.2rem 0.45rem; font-size: 0.7rem;"
+                    hx-delete="/cursos-clases/clase/{{ cl.id }}"
+                    hx-confirm="¿Eliminar la asignatura {{ cl.nombre }}?">
+              Eliminar
+            </button>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel Principal: Detalle de Nómina del Curso Seleccionado -->
+  <div>
+    <div class="card">
+      <div class="card-header-row" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+        <div>
+          <h2 style="margin: 0 0 0.35rem 0;">{{ curso_activo.nombre if curso_activo else "Seleccione un Curso" }}</h2>
+          <div class="card-description">
+            Director de Curso: <strong>{{ curso_activo.director_curso if curso_activo else "N/A" }}</strong> - Grado: {{ curso_activo.grado if curso_activo else "-" }} (Sección {{ curso_activo.seccion if curso_activo else "-" }}) - Año: {{ curso_activo.anio_lectivo if curso_activo else "-" }}
+          </div>
+        </div>
+        {% if curso_activo %}
+        <div style="display: flex; gap: 0.4rem;">
+          <button type="button" class="secondary" style="padding: 0.35rem 0.75rem; font-size: var(--fs-xs);"
+                  hx-get="/cursos-clases/modal-curso/{{ curso_activo.id }}"
+                  hx-target="#modal-container"
+                  hx-swap="innerHTML">
+            Editar Curso
+          </button>
+          <button type="button" class="danger" style="padding: 0.35rem 0.75rem; font-size: var(--fs-xs);"
+                  hx-delete="/cursos-clases/curso/{{ curso_activo.id }}"
+                  hx-confirm="¿Desea eliminar el curso {{ curso_activo.nombre }} y sus asignaciones?">
+            Eliminar Curso
+          </button>
+        </div>
+        {% endif %}
+      </div>
+
+      {% if curso_activo %}
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <h3 style="margin: 0;">Estudiantes Matriculados ({{ estudiantes_curso|length }})</h3>
+        <button type="button" class="primary" style="padding: 0.35rem 0.75rem; font-size: var(--fs-xs);"
+                hx-get="/cursos-clases/curso/{{ curso_activo.id }}/modal-estudiantes"
+                hx-target="#modal-container"
+                hx-swap="innerHTML">
+          + Asignar / Editar Nómina
+        </button>
+      </div>
+
+      <div class="data-table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>No.</th>
+              <th>Nombre Completo</th>
+              <th>Documento</th>
+              <th>Edad</th>
+              <th>Observaciones</th>
+              <th style="text-align: right;">Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for est in estudiantes_curso %}
+            <tr>
+              <td style="color: var(--text-muted);">{{ loop.index }}</td>
+              <td style="font-weight: 600; color: var(--c-blue-dark);">
+                {{ est.nombre_completo }}
+              </td>
+              <td style="color: var(--text-secondary);">{{ est.numero_documento }}</td>
+              <td style="color: var(--text-secondary);">{{ est.edad }} años</td>
+              <td>
+                <span class="resultado-badge acuerdo" style="font-size: 0.75rem;">
+                  {{ est.reportes|length }} observaciones
+                </span>
+              </td>
+              <td style="text-align: right;">
+                <button type="button" class="danger" style="padding: 0.25rem 0.5rem; font-size: 0.7rem;"
+                        hx-delete="/cursos-clases/curso/{{ curso_activo.id }}/estudiante/{{ est.id }}"
+                        hx-confirm="¿Remover a {{ est.nombre_completo }} de {{ curso_activo.nombre }}?">
+                  Quitar del Curso
+                </button>
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="6" style="padding: 2rem; text-align: center; color: var(--text-muted);">
+                No hay estudiantes matriculados en este curso. Utilice el botón "+ Asignar / Editar Nómina" para agregar alumnos.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+        Seleccione un curso en el panel izquierdo para visualizar y gestionar sus estudiantes.
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+

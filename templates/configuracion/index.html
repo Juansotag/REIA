@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Ajustes y Configuración - REIA GovLab{% endblock %}
+
+{% block content %}
+<div class="page-intro">
+  <h1>Configuración del Sistema</h1>
+  <p>Ajustes técnicos de motores de Inteligencia Artificial, Speech-to-Text y parámetros del GovLab persistidos en <code>.env</code>.</p>
+</div>
+
+<div class="card" style="max-width: 750px; margin: 0 auto;">
+  <div class="card-header-row">
+    <div>
+      <h2>Ajustes de Motores de IA y Audio</h2>
+      <div class="card-description">Las credenciales se almacenan automáticamente en el archivo <code>.env</code> de la raíz y se aplican en caliente.</div>
+    </div>
+  </div>
+
+  <form hx-post="/configuracion/guardar" hx-target="#status-guardado" hx-swap="innerHTML">
+    <!-- Proveedor de LLM -->
+    <div class="form-group" style="margin-bottom: 1.5rem;">
+      <label>Proveedor de Inteligencia Artificial Principal</label>
+      <div style="display: flex; gap: 1.5rem; margin-top: 0.4rem; flex-wrap: wrap;">
+        <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; text-transform: none; font-weight: normal;">
+          <input type="radio" name="llm_provider" value="openai" {% if llm_provider == 'openai' %}checked{% endif %}>
+          <strong>OpenAI</strong> (GPT-4o / GPT-4o-mini)
+        </label>
+        <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; text-transform: none; font-weight: normal;">
+          <input type="radio" name="llm_provider" value="anthropic" {% if llm_provider == 'anthropic' %}checked{% endif %}>
+          <strong>Anthropic</strong> (Claude 3.5 Sonnet / Haiku)
+        </label>
+      </div>
+    </div>
+
+    <!-- API Keys Protegidas -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+      <div class="form-group">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+          <label style="margin: 0;">OpenAI API Key</label>
+          {% if openai_configurada %}
+          <span class="resultado-badge acuerdo" style="font-size: 0.65rem;">Configurada ({{ openai_mask }})</span>
+          {% else %}
+          <span class="resultado-badge rechazo" style="font-size: 0.65rem;">No configurada</span>
+          {% endif %}
+        </div>
+        <input type="password" name="openai_api_key" value="" placeholder="{% if openai_configurada %}Dejar en blanco para conservar clave actual{% else %}sk-...{% endif %}" autocomplete="new-password">
+        <div style="font-size: var(--fs-xs); color: var(--text-muted); margin-top: 0.25rem;">
+          Almacenada exclusivamente en el archivo local <code>.env</code>.
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+          <label style="margin: 0;">Anthropic API Key</label>
+          {% if anthropic_configurada %}
+          <span class="resultado-badge acuerdo" style="font-size: 0.65rem;">Configurada ({{ anthropic_mask }})</span>
+          {% else %}
+          <span class="resultado-badge rechazo" style="font-size: 0.65rem;">No configurada</span>
+          {% endif %}
+        </div>
+        <input type="password" name="anthropic_api_key" value="" placeholder="{% if anthropic_configurada %}Dejar en blanco para conservar clave actual{% else %}sk-ant-...{% endif %}" autocomplete="new-password">
+        <div style="font-size: var(--fs-xs); color: var(--text-muted); margin-top: 0.25rem;">
+          Almacenada exclusivamente en el archivo local <code>.env</code>.
+        </div>
+      </div>
+    </div>
+
+    <!-- Motor STT -->
+    <div class="form-group" style="margin-top: 1rem;">
+      <label>Motor de Voz a Texto (Speech-to-Text)</label>
+      <select name="stt_engine">
+        <option value="hybrid" {% if stt_engine == 'hybrid' %}selected{% endif %}>
+          Híbrido (Web Speech API nativo en navegador + Whisper respaldo)
+        </option>
+        <option value="native" {% if stt_engine == 'native' %}selected{% endif %}>
+          Exclusivamente Web Speech API (Nativo, instantáneo y sin consumo de cuota)
+        </option>
+        <option value="whisper" {% if stt_engine == 'whisper' %}selected{% endif %}>
+          Exclusivamente Whisper en Servidor (Audio subido y procesado)
+        </option>
+      </select>
+    </div>
+
+    <div class="form-actions">
+      <div id="status-guardado" class="save-status"></div>
+      <button type="submit" class="primary">Guardar en .env y Aplicar</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+

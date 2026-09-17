@@ -1,0 +1,17 @@
+{% if menciones and menciones|length > 0 %}
+<div class="card" style="background: var(--c-cream); border-left: 4px solid var(--c-yellow); padding: 0.8rem 1rem; margin-top: 0.5rem;">
+  <div style="font-size: var(--fs-xs); font-weight: 700; text-transform: uppercase; color: #7a5c00; margin-bottom: 0.4rem;">
+    <span>Nombres de companeros detectados en la observacion:</span>
+  </div>
+  <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+    {% for m in menciones %}
+    <div class="coaching-tag" style="background: #fff; border: 1.5px solid var(--c-yellow); font-weight: 600; display: flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.6rem;">
+      <span>{{ m.nombre_sugerido }}</span>
+      <input type="hidden" name="companero_confirmado_id" value="{{ m.estudiante_id }}">
+      <input type="hidden" name="companero_confirmado_nombre" value="{{ m.nombre_sugerido }}">
+      <span style="color: var(--text-muted); font-size: 0.75rem;">(Anonimizado como [COMPANERO_{{ loop.index }}])</span>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}

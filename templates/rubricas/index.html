@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Rúbricas de Evaluación - REIA GovLab{% endblock %}
+
+{% block content %}
+<div class="page-intro">
+  <h1>Catálogo de Rúbricas de Evaluación</h1>
+  <p>Instrumentos formativos multidimensionales con distinción entre escalas continuas (0.0 a 5.0) y discretas (niveles 1 a 5).</p>
+</div>
+
+<div style="display: flex; justify-content: flex-end; margin-bottom: 1.5rem;">
+  <button class="primary" hx-get="/rubricas/modal-crear" hx-target="#modal-container" hx-swap="innerHTML">
+    + Nueva Rúbrica
+  </button>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 1.5rem;">
+  {% for r in rubricas %}
+  <div class="card">
+    <div class="card-header-row" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+      <div style="max-width: 65%;">
+        <h2 style="margin: 0 0 0.35rem 0; font-size: var(--fs-lg);">{{ r.nombre }}</h2>
+        <div class="card-description">{{ r.descripcion }}</div>
+        {% if r.clase %}
+        <div style="font-size: var(--fs-xs); color: var(--c-blue-dark); font-weight: 600; margin-top: 0.25rem;">
+          Asignatura: {{ r.clase.nombre }}
+        </div>
+        {% endif %}
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.4rem;">
+        {% if r.tipo_escala == 'DISCRETA' %}
+        <span class="resultado-badge aplazamiento" style="font-size: 0.75rem; text-transform: uppercase;">
+          Escala Discreta (Niveles 1 a 5)
+        </span>
+        {% else %}
+        <span class="resultado-badge acuerdo" style="font-size: 0.75rem; text-transform: uppercase;">
+          Escala Continua (0.0 a 5.0)
+        </span>
+        {% endif %}
+
+        <div style="display: flex; gap: 0.35rem; margin-top: 0.25rem;">
+          <button type="button" class="secondary" style="padding: 0.25rem 0.55rem; font-size: var(--fs-xs);"
+                  hx-get="/rubricas/modal-editar/{{ r.id }}"
+                  hx-target="#modal-container"
+                  hx-swap="innerHTML">
+            Editar
+          </button>
+          <button type="button" class="danger" style="padding: 0.25rem 0.55rem; font-size: var(--fs-xs);"
+                  hx-delete="/rubricas/{{ r.id }}"
+                  hx-confirm="¿Desea eliminar la rúbrica '{{ r.nombre }}' y todas sus dimensiones?">
+            Eliminar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <h4>Dimensiones Evaluadas ({{ r.dimensiones|length }})</h4>
+    <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 0.75rem;">
+      {% for dim in r.dimensiones %}
+      <div class="coaching-item" style="border-left-color: var(--c-blue-dark); margin-bottom: 0;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <strong style="color: var(--c-blue-dark);">{{ dim.nombre }}</strong>
+          <span style="font-size: var(--fs-xs); color: var(--text-muted); font-weight: 600;">Peso: {{ dim.peso_porcentual }}%</span>
+        </div>
+        <div style="font-size: var(--fs-xs); color: var(--text-muted); margin-top: 0.2rem;">
+          Clave técnica: <code>{{ dim.clave }}</code>
+        </div>
+        
+        <!-- Tramos de desempeño -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem; font-size: 0.75rem;">
+          <div style="background: #fde8e8; padding: 0.4rem; border-radius: 4px;">
+            <strong>Bajo (0.0 - 2.9):</strong> {{ dim.descriptor_bajo or 'Sin descriptor' }}
+          </div>
+          <div style="background: #fff9e6; padding: 0.4rem; border-radius: 4px;">
+            <strong>Básico (3.0 - 3.9):</strong> {{ dim.descriptor_basico or 'Sin descriptor' }}
+          </div>
+          <div style="background: #e8f4fd; padding: 0.4rem; border-radius: 4px;">
+            <strong>Alto (4.0 - 4.5):</strong> {{ dim.descriptor_alto or 'Sin descriptor' }}
+          </div>
+          <div style="background: #eafaf1; padding: 0.4rem; border-radius: 4px;">
+            <strong>Superior (4.6 - 5.0):</strong> {{ dim.descriptor_superior or 'Sin descriptor' }}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% else %}
+  <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-muted);">
+    No hay rúbricas registradas en el sistema. Utilice el botón "+ Nueva Rúbrica" para configurar la primera.
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
+

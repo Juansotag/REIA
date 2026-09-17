@@ -1,0 +1,68 @@
+<div class="data-table-container">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Estudiante</th>
+        <th>Curso / Clase</th>
+        <th>Observación</th>
+        <th>Notas Rúbrica</th>
+        <th style="text-align: right;">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for rep in reportes %}
+      <tr>
+        <td style="white-space: nowrap; font-size: var(--fs-xs); color: var(--text-secondary);">
+          {{ rep.fecha.strftime("%d/%m/%Y") }}
+        </td>
+        <td style="font-weight: 700; color: var(--c-blue-dark); white-space: nowrap;">
+          {{ rep.estudiante.nombre_completo }}
+        </td>
+        <td style="font-size: var(--fs-xs); white-space: nowrap;">
+          <strong>{{ rep.curso.nombre }}</strong><br>
+          <span style="color: var(--text-muted);">{{ rep.clase.nombre }}</span>
+        </td>
+        <td style="max-width: 300px; font-size: var(--fs-sm); color: var(--text-secondary); line-height: 1.4;">
+          {{ rep.texto_original[:110] }}{% if rep.texto_original|length > 110 %}...{% endif %}
+        </td>
+        <td>
+          <div style="display: flex; flex-wrap: wrap; gap: 0.25rem;">
+            {% for dim, nota in rep.calificaciones_dimensiones.items() %}
+            <span class="resultado-badge {% if nota >= 4.0 %}acuerdo{% elif nota >= 3.0 %}aplazamiento{% else %}rechazo{% endif %}" style="font-size: 0.7rem; padding: 0.1rem 0.4rem;">
+              {{ "%.1f"|format(nota) }}
+            </span>
+            {% endfor %}
+          </div>
+        </td>
+        <td style="text-align: right; white-space: nowrap;">
+          <button class="ghost" style="padding: 0.3rem 0.55rem; font-size: var(--fs-xs); margin-right: 0.25rem;"
+                  hx-get="/reportes/modal-detalle/{{ rep.id }}"
+                  hx-target="#modal-container"
+                  hx-swap="innerHTML">
+            Ver
+          </button>
+          <button class="secondary" style="padding: 0.3rem 0.55rem; font-size: var(--fs-xs); margin-right: 0.25rem;"
+                  hx-get="/reportes/modal-editar/{{ rep.id }}"
+                  hx-target="#modal-container"
+                  hx-swap="innerHTML">
+            Editar
+          </button>
+          <button class="danger" style="padding: 0.3rem 0.55rem; font-size: var(--fs-xs);"
+                  hx-delete="/reportes/{{ rep.id }}"
+                  hx-target="#tabla-historial-reportes"
+                  hx-confirm="¿Desea eliminar esta observación de forma permanente?">
+            Eliminar
+          </button>
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="6" style="padding: 2.5rem; text-align: center; color: var(--text-muted);">
+          No se encontraron observaciones con los filtros seleccionados.
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

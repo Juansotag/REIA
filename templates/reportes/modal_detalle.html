@@ -1,0 +1,54 @@
+<div class="modal-overlay" onclick="if(event.target===this) this.remove()">
+  <div class="modal-box" style="max-width: 650px;">
+    <div class="modal-header">
+      <h3>Detalle de la Observación</h3>
+      <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">x</button>
+    </div>
+
+    <div style="background: var(--bg-main); padding: 1rem; border-radius: var(--radius-sm); margin-bottom: 1.25rem;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: var(--fs-sm);">
+        <div><strong>Estudiante:</strong> {{ reporte.estudiante.nombre_completo }}</div>
+        <div><strong>Identificación:</strong> {{ reporte.estudiante.tipo_documento }} {{ reporte.estudiante.numero_documento }}</div>
+        <div><strong>Curso:</strong> {{ reporte.curso.nombre }}</div>
+        <div><strong>Clase:</strong> {{ reporte.clase.nombre }}</div>
+        <div><strong>Fecha:</strong> {{ reporte.fecha.strftime("%d/%m/%Y") }}</div>
+        <div><strong>UUID Anónimo:</strong> <code>{{ reporte.uuid_anonimo }}</code></div>
+      </div>
+    </div>
+
+    <h4>Observación del Docente</h4>
+    <div style="background: #ffffff; padding: 1rem; border: 1.5px solid var(--c-blue-tint); border-radius: var(--radius-sm); margin-bottom: 1rem; line-height: 1.6;">
+      <p style="margin: 0; color: var(--text-primary);">{{ reporte.texto_original }}</p>
+    </div>
+
+    <h4 style="color: var(--text-muted); font-size: var(--fs-xs); text-transform: uppercase;">Texto Sanitizado para el LLM (Zero-PII)</h4>
+    <div style="background: #f8fafc; padding: 0.75rem; border: 1px dashed var(--border-color); border-radius: var(--radius-sm); margin-bottom: 1.25rem; font-size: var(--fs-sm); color: var(--text-muted);">
+      {{ reporte.texto_anonimizado }}
+    </div>
+
+    {% if reporte.rubrica %}
+    <h4>Calificaciones según Rúbrica: {{ reporte.rubrica.nombre }}</h4>
+    <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+      {% for item in dimensiones_info %}
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.75rem; background: var(--bg-main); border-radius: 4px;">
+        <span style="font-weight: 600; font-size: var(--fs-sm); color: var(--c-blue-dark);">{{ item.nombre }}</span>
+        <span class="resultado-badge {% if item.nota >= 4.0 %}acuerdo{% elif item.nota >= 3.0 %}aplazamiento{% else %}rechazo{% endif %}">
+          {{ "%.1f"|format(item.nota) }}
+        </span>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="modal-actions" style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem;">
+      <button type="button" class="secondary"
+              hx-get="/reportes/modal-editar/{{ reporte.id }}"
+              hx-target="#modal-container"
+              hx-swap="innerHTML">
+        Editar Reporte
+      </button>
+      <button type="button" class="primary" onclick="this.closest('.modal-overlay').remove()">Cerrar</button>
+    </div>
+  </div>
+</div>
+

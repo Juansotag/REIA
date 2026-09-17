@@ -1,0 +1,86 @@
+<div class="modal-overlay" onclick="if(event.target===this) this.remove()">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>{% if estudiante %}Editar Estudiante{% else %}Nuevo Estudiante{% endif %}</h3>
+      <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">x</button>
+    </div>
+
+    <form hx-post="{% if estudiante %}/estudiantes/{{ estudiante.id }}{% else %}/estudiantes{% endif %}"
+          hx-target="#tabla-estudiantes"
+          hx-on::after-request="this.closest('.modal-overlay').remove()">
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="form-group">
+          <label>Nombres *</label>
+          <input type="text" name="nombres" value="{{ estudiante.nombres if estudiante else '' }}" required>
+        </div>
+        <div class="form-group">
+          <label>Apellidos *</label>
+          <input type="text" name="apellidos" value="{{ estudiante.apellidos if estudiante else '' }}" required>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 100px 1fr; gap: 1rem;">
+        <div class="form-group">
+          <label>Tipo Doc</label>
+          <select name="tipo_documento">
+            <option value="TI" {% if estudiante and estudiante.tipo_documento == 'TI' %}selected{% endif %}>TI</option>
+            <option value="CC" {% if estudiante and estudiante.tipo_documento == 'CC' %}selected{% endif %}>CC</option>
+            <option value="RC" {% if estudiante and estudiante.tipo_documento == 'RC' %}selected{% endif %}>RC</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Número de Documento *</label>
+          <input type="text" name="numero_documento" value="{{ estudiante.numero_documento if estudiante else '' }}" required>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+        <div class="form-group">
+          <label>Género</label>
+          <select name="genero">
+            <option value="Masculino" {% if estudiante and estudiante.genero == 'Masculino' %}selected{% endif %}>Masculino</option>
+            <option value="Femenino" {% if estudiante and estudiante.genero == 'Femenino' %}selected{% endif %}>Femenino</option>
+            <option value="Otro" {% if estudiante and estudiante.genero == 'Otro' %}selected{% endif %}>Otro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Edad *</label>
+          <input type="number" name="edad" value="{{ estudiante.edad if estudiante else 14 }}" min="8" max="22" required>
+        </div>
+        <div class="form-group">
+          <label>Grado (5 a 11) *</label>
+          <input type="number" name="grado_actual" value="{{ estudiante.grado_actual if estudiante else 9 }}" min="5" max="11" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Curso Asignado</label>
+        <select name="curso_id">
+          <option value="">Seleccione un curso...</option>
+          {% for c in cursos %}
+          <option value="{{ c.id }}" {% if estudiante and c in estudiante.cursos %}selected{% endif %}>
+            {{ c.nombre }} ({{ c.grado }}º grado)
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="form-group">
+          <label>Nombre del Acudiente</label>
+          <input type="text" name="acudiente_nombre" value="{{ estudiante.acudiente_nombre if estudiante else '' }}">
+        </div>
+        <div class="form-group">
+          <label>Contacto Acudiente</label>
+          <input type="text" name="acudiente_contacto" value="{{ estudiante.acudiente_contacto if estudiante else '' }}">
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="ghost" onclick="this.closest('.modal-overlay').remove()">Cancelar</button>
+        <button type="submit" class="primary">Guardar Estudiante</button>
+      </div>
+    </form>
+  </div>
+</div>

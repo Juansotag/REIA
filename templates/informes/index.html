@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}Informes y Evaluación - REIA GovLab{% endblock %}
+
+{% block content %}
+<div class="page-intro">
+  <h1>Informes de Evaluación Formativa</h1>
+  <p>Generación de informes consolidados con inteligencia artificial, gráficas de evolución y consulta del historial guardado.</p>
+</div>
+
+<!-- Barra de Subpestañas: Generador vs Historial -->
+<div class="subtabs-bar">
+  <button type="button" class="subtab-btn active" id="tab-btn-generador" onclick="cambiarVistaInformes('generador')">
+    Generar Nuevo Informe
+  </button>
+  <button type="button" class="subtab-btn" id="tab-btn-historial-inf" onclick="cambiarVistaInformes('historial')">
+    Historial de Informes y Modelos
+  </button>
+</div>
+
+<!-- Vista 1: Generador de Nuevo Informe -->
+<div id="seccion-generador">
+  <div class="session-layout">
+    <!-- Panel de Parámetros del Informe -->
+    <div>
+      <div class="card">
+        <div class="card-header-row">
+          <h3>Parámetros del Informe</h3>
+        </div>
+
+        <form id="form-generar-informe"
+              hx-post="/informes/generar"
+              hx-target="#panel-preview"
+              hx-indicator="#loading-spinner">
+
+          <!-- Selector Tipo de Informe -->
+          <div class="form-group">
+            <label>Tipo de Informe</label>
+            <div style="display: flex; gap: 1rem; margin-top: 0.3rem;">
+              <label style="text-transform: none; font-weight: normal; display: flex; align-items: center; gap: 0.3rem; cursor: pointer;">
+                <input type="radio" name="tipo_informe" id="radio-individual" value="INDIVIDUAL" checked onchange="toggleTipoInforme(this.value)">
+                Individual por Estudiante
+              </label>
+              <label style="text-transform: none; font-weight: normal; display: flex; align-items: center; gap: 0.3rem; cursor: pointer;">
+                <input type="radio" name="tipo_informe" id="radio-agregado" value="AGREGADO" onchange="toggleTipoInforme(this.value)">
+                Agregado por Curso
+              </label>
+            </div>
+          </div>
+
+          <!-- Selector Estudiante (visible en Individual) -->
+          <div class="form-group" id="campo-estudiante">
+            <label>Estudiante a Evaluar</label>
+            <select name="estudiante_id" id="sel-estudiante">
+              {% for e in estudiantes %}
+              <option value="{{ e.id }}">{{ e.nombre_completo }} ({{ e.grado_actual }}º grado)</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Selector Curso (visible en Agregado) -->
+          <div class="form-group" id="campo-curso" style="display: none;">
+            <label>Curso Completo</label>
+            <select name="curso_id" id="sel-curso">
+              {% for c in cursos %}
+              <option value="{{ c.id }}">{{ c.nombre }} ({{ c.grado }}º grado)</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Rúbrica -->
+          <div class="form-group">
+            <label>Rúbrica a Evaluar</label>
+            <select name="rubrica_id">
+              {% for r in rubricas %}
+              <option value="{{ r.id }}">{{ r.nombre }} ({{ r.tipo_escala }})</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Rango de Fechas Dinámico y Adaptable -->
+          <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; width: 100%; margin-bottom: 0.5rem;">
+            <div class="form-group" style="flex: 1 1 130px; min-width: 0;">
+              <label>Fecha Inicial</label>
+              <input type="date" name="fecha_inicio" value="2026-02-01" required style="width: 100%; min-width: 0; box-sizing: border-box;">
+            </div>
+            <div class="form-group" style="flex: 1 1 130px; min-width: 0;">
+              <label>Fecha Final</label>
+              <input type="date" name="fecha_fin" value="2026-11-30" required style="width: 100%; min-width: 0; box-sizing: border-box;">
+            </div>
+          </div>
+
+          <!-- Modelos / Plantillas Guardadas -->
+          <div class="form-group">
+            <label>Cargar Plantilla de Prompt</label>
+            <select id="sel-plantilla" onchange="cargarPlantillaPrompt(this.value)">
+              <option value="">Seleccione una plantilla...</option>
+              {% for m in modelos %}
+              <option value="{{ m.prompt_base }}">{{ m.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Prompt Personalizado para el LLM -->
+          <div class="form-group">
+            <label>Instrucciones o Prompt para la IA</label>
+            <textarea id="prompt-personalizado" name="prompt_personalizado" rows="4"
+                      placeholder="Instrucciones sobre el tono, enfoque o destinatario del informe...">Redactar un informe con tono pedagógico formativo y cercano, destacando fortalezas y plan de acción para el hogar.</textarea>
+          </div>
+
+          <button type="submit" class="primary" style="width: 100%; margin-top: 0.5rem; padding: 0.8rem;">
+            Generar Informe con IA
+          </button>
+        </form>
+
+        <div id="loading-spinner" class="status-line loading htmx-indicator" style="justify-content: center; margin-top: 1rem;">
+          La IA está analizando las observaciones y procesando la gráfica...
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel de Previsualización y Descarga -->
+    <div id="panel-preview">
+      <div class="card" style="text-align: center; padding: 4rem 2rem;">
+        <h3>Área de Previsualización del Informe</h3>
+        <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto;">
+          Configure los parámetros en el panel izquierdo y haga clic en <strong>"Generar Informe con IA"</strong> para visualizar el reporte, la gráfica analítica y descargar en Word y PDF.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Vista 2: Historial de Informes Guardados y Modelos -->
+<div id="seccion-historial-inf" style="display: none;">
+  {% include "informes/historial_informes.html" %}
+</div>
+
+<script>
+function toggleTipoInforme(val) {
+  const campoEst = document.getElementById("campo-estudiante");
+  const campoCur = document.getElementById("campo-curso");
+  if (val === "INDIVIDUAL") {
+    campoEst.style.display = "block";
+    campoCur.style.display = "none";
+  } else {
+    campoEst.style.display = "none";
+    campoCur.style.display = "block";
+  }
+}
+
+function cargarPlantillaPrompt(texto) {
+  if (texto) {
+    document.getElementById("prompt-personalizado").value = texto;
+  }
+}
+
+function cambiarVistaInformes(vista) {
+  const secGen = document.getElementById("seccion-generador");
+  const secHist = document.getElementById("seccion-historial-inf");
+  const btnGen = document.getElementById("tab-btn-generador");
+  const btnHist = document.getElementById("tab-btn-historial-inf");
+
+  if (vista === "generador") {
+    secGen.style.display = "block";
+    secHist.style.display = "none";
+    btnGen.classList.add("active");
+    btnHist.classList.remove("active");
+  } else {
+    secGen.style.display = "none";
+    secHist.style.display = "block";
+    btnGen.classList.remove("active");
+    btnHist.classList.add("active");
+  }
+}
+
+function aplicarPlantilla(tipo, prompt) {
+  cambiarVistaInformes('generador');
+  if (tipo === 'INDIVIDUAL') {
+    document.getElementById('radio-individual').checked = true;
+    toggleTipoInforme('INDIVIDUAL');
+  } else {
+    document.getElementById('radio-agregado').checked = true;
+    toggleTipoInforme('AGREGADO');
+  }
+  document.getElementById('prompt-personalizado').value = prompt;
+}
+</script>
+{% endblock %}

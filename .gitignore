@@ -1,0 +1,31 @@
+# Credenciales y variables de entorno - SEGURIDAD CRÍTICA
+.env
+.env.*
+!.env.example
+
+# Base de datos local
+database/*.db
+database/*.sqlite
+database/*.sqlite3
+*.db
+*.sqlite
+
+# Python / Entorno
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+venv/
+env/
+.venv/
+
+# Documentos generados temporales
+*.docx
+*.pdf
+!templates/**
+
+# IDEs y SO
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

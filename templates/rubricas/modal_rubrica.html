@@ -1,0 +1,146 @@
+<div class="modal-overlay" onclick="if(event.target===this) this.remove()">
+  <div class="modal-box" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
+    <div class="modal-header">
+      <h3>{% if rubrica %}Editar Rúbrica de Evaluación{% else %}Nueva Rúbrica de Evaluación{% endif %}</h3>
+      <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">x</button>
+    </div>
+
+    <form method="post" action="{% if rubrica %}/rubricas/{{ rubrica.id }}{% else %}/rubricas{% endif %}">
+      <div class="form-group" style="margin-bottom: 0.85rem;">
+        <label for="rub_nombre" style="font-weight: 700; color: var(--c-blue-dark); font-size: var(--fs-sm);">Nombre de la Rúbrica *</label>
+        <input type="text" id="rub_nombre" name="nombre" value="{{ rubrica.nombre if rubrica else '' }}" placeholder="Ej. Rúbrica de Habilidades Argumentativas y Razonamiento Crítico" required style="width: 100%;">
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
+        <div class="form-group">
+          <label for="rub_tipo_escala" style="font-weight: 700; color: var(--c-blue-dark); font-size: var(--fs-sm);">Tipo de Escala *</label>
+          <select id="rub_tipo_escala" name="tipo_escala" required style="width: 100%;" onchange="actualizarAyudaEscala(this.value)">
+            <option value="CONTINUA" {% if not rubrica or rubrica.tipo_escala == 'CONTINUA' %}selected{% endif %}>
+              Continua (Escala decimal 0.0 a 5.0 con sliders)
+            </option>
+            <option value="DISCRETA" {% if rubrica and rubrica.tipo_escala == 'DISCRETA' %}selected{% endif %}>
+              Discreta (Niveles enteros 1 a 5 con descriptores fijos)
+            </option>
+          </select>
+          <div id="ayuda-escala" style="font-size: var(--fs-xs); color: var(--text-muted); margin-top: 0.25rem;">
+            {% if rubrica and rubrica.tipo_escala == 'DISCRETA' %}
+            Escala ordinal entera (1: Bajo, 2: Básico bajo, 3: Básico, 4: Alto, 5: Superior).
+            {% else %}
+            Escala decimal continua (0.0 a 5.0), ideal para ponderaciones graduales e inferencias directas de IA.
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="rub_clase" style="font-weight: 700; color: var(--c-blue-dark); font-size: var(--fs-sm);">Asignatura Asociada</label>
+          <select id="rub_clase" name="clase_id" style="width: 100%;">
+            <option value="">-- General / Todas las Asignaturas --</option>
+            {% for cl in clases %}
+            <option value="{{ cl.id }}" {% if rubrica and rubrica.clase_id == cl.id %}selected{% endif %}>{{ cl.nombre }} ({{ cl.area }})</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 1.25rem;">
+        <label for="rub_desc" style="font-weight: 700; color: var(--c-blue-dark); font-size: var(--fs-sm);">Propósito Formativo y Descripción Pedagógica</label>
+        <textarea id="rub_desc" name="descripcion" rows="2" placeholder="Explique las metas de aprendizaje y competencias a evaluar con este instrumento..." style="width: 100%; border: 1.5px solid var(--c-blue-tint); border-radius: var(--radius-sm); padding: 0.5rem; font-family: inherit; font-size: var(--fs-sm);">{{ rubrica.descripcion if rubrica else '' }}</textarea>
+      </div>
+
+      <!-- Sección de Dimensiones -->
+      <div style="border-top: 2px solid var(--border-color); padding-top: 1rem; margin-bottom: 1rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <h4 style="margin: 0; color: var(--c-blue-dark);">Dimensiones de la Rúbrica</h4>
+          <button type="button" class="secondary" style="padding: 0.3rem 0.65rem; font-size: var(--fs-xs);" onclick="agregarFilaDimension()">
+            + Añadir Dimensión
+          </button>
+        </div>
+
+        <div id="contenedor-dimensiones" style="display: flex; flex-direction: column; gap: 0.85rem;">
+          {% if rubrica and rubrica.dimensiones %}
+            {% for dim in rubrica.dimensiones %}
+            <div class="dim-card" style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.85rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <strong style="color: var(--c-blue-dark); font-size: var(--fs-sm);">Dimensión</strong>
+                <button type="button" class="danger" style="padding: 0.2rem 0.45rem; font-size: 0.7rem;" onclick="this.closest('.dim-card').remove()">Eliminar</button>
+              </div>
+              <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <input type="text" name="dim_nombre[]" value="{{ dim.nombre }}" placeholder="Nombre de la dimensión" required style="font-size: var(--fs-sm);">
+                <input type="text" name="dim_clave[]" value="{{ dim.clave }}" placeholder="clave_tecnica" required style="font-size: var(--fs-sm);">
+                <input type="number" name="dim_peso[]" value="{{ dim.peso_porcentual }}" placeholder="Peso %" min="0" max="100" style="font-size: var(--fs-sm);">
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; font-size: var(--fs-xs);">
+                <input type="text" name="dim_bajo[]" value="{{ dim.descriptor_bajo or '' }}" placeholder="Descriptor Bajo (0.0 - 2.9)">
+                <input type="text" name="dim_basico[]" value="{{ dim.descriptor_basico or '' }}" placeholder="Descriptor Básico (3.0 - 3.9)">
+                <input type="text" name="dim_alto[]" value="{{ dim.descriptor_alto or '' }}" placeholder="Descriptor Alto (4.0 - 4.5)">
+                <input type="text" name="dim_superior[]" value="{{ dim.descriptor_superior or '' }}" placeholder="Descriptor Superior (4.6 - 5.0)">
+              </div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <!-- Fila por defecto para nueva rúbrica -->
+            <div class="dim-card" style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.85rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <strong style="color: var(--c-blue-dark); font-size: var(--fs-sm);">Dimensión 1</strong>
+                <button type="button" class="danger" style="padding: 0.2rem 0.45rem; font-size: 0.7rem;" onclick="this.closest('.dim-card').remove()">Eliminar</button>
+              </div>
+              <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <input type="text" name="dim_nombre[]" placeholder="Nombre (ej. Claridad Argumentativa)" required style="font-size: var(--fs-sm);">
+                <input type="text" name="dim_clave[]" placeholder="clave (ej. dim_claridad)" required style="font-size: var(--fs-sm);">
+                <input type="number" name="dim_peso[]" value="50" placeholder="Peso %" min="0" max="100" style="font-size: var(--fs-sm);">
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; font-size: var(--fs-xs);">
+                <input type="text" name="dim_bajo[]" placeholder="Descriptor Bajo (0.0 - 2.9)">
+                <input type="text" name="dim_basico[]" placeholder="Descriptor Básico (3.0 - 3.9)">
+                <input type="text" name="dim_alto[]" placeholder="Descriptor Alto (4.0 - 4.5)">
+                <input type="text" name="dim_superior[]" placeholder="Descriptor Superior (4.6 - 5.0)">
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="modal-actions" style="display: flex; justify-content: flex-end; gap: 0.5rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+        <button type="button" class="ghost" onclick="this.closest('.modal-overlay').remove()">Cancelar</button>
+        <button type="submit" class="primary">{% if rubrica %}Actualizar Rúbrica{% else %}Crear Rúbrica{% endif %}</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function actualizarAyudaEscala(tipo) {
+  const ayuda = document.getElementById("ayuda-escala");
+  if (tipo === "DISCRETA") {
+    ayuda.innerText = "Escala ordinal entera (1: Bajo, 2: Básico bajo, 3: Básico, 4: Alto, 5: Superior), ideal para rúbricas con descriptores fijos por nivel.";
+  } else {
+    ayuda.innerText = "Escala decimal continua (0.0 a 5.0), ideal para evaluaciones graduales y análisis cuantitativos con sliders.";
+  }
+}
+
+function agregarFilaDimension() {
+  const cont = document.getElementById("contenedor-dimensiones");
+  const count = cont.children.length + 1;
+  const div = document.createElement("div");
+  div.className = "dim-card";
+  div.style = "background: var(--bg-main); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.85rem;";
+  div.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+      <strong style="color: var(--c-blue-dark); font-size: var(--fs-sm);">Dimensión ${count}</strong>
+      <button type="button" class="danger" style="padding: 0.2rem 0.45rem; font-size: 0.7rem;" onclick="this.closest('.dim-card').remove()">Eliminar</button>
+    </div>
+    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 0.5rem; margin-bottom: 0.5rem;">
+      <input type="text" name="dim_nombre[]" placeholder="Nombre de la dimensión" required style="font-size: var(--fs-sm);">
+      <input type="text" name="dim_clave[]" placeholder="clave_${count}" required style="font-size: var(--fs-sm);">
+      <input type="number" name="dim_peso[]" value="25" placeholder="Peso %" min="0" max="100" style="font-size: var(--fs-sm);">
+    </div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; font-size: var(--fs-xs);">
+      <input type="text" name="dim_bajo[]" placeholder="Descriptor Bajo (0.0 - 2.9)">
+      <input type="text" name="dim_basico[]" placeholder="Descriptor Básico (3.0 - 3.9)">
+      <input type="text" name="dim_alto[]" placeholder="Descriptor Alto (4.0 - 4.5)">
+      <input type="text" name="dim_superior[]" placeholder="Descriptor Superior (4.6 - 5.0)">
+    </div>
+  `;
+  cont.appendChild(div);
+}
+</script>

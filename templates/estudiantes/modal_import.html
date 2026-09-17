@@ -1,0 +1,29 @@
+<div class="modal-overlay" onclick="if(event.target===this) this.remove()">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>Importación Masiva de Estudiantes</h3>
+      <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">x</button>
+    </div>
+
+    <div class="card-description">
+      Suba un archivo <strong>Excel (.xlsx)</strong> o <strong>CSV</strong> con las columnas: <code>nombres</code>, <code>apellidos</code>, <code>documento</code>, <code>grado</code>, <code>edad</code>, <code>genero</code>.
+    </div>
+
+    <form hx-post="/estudiantes/importar"
+          hx-target="#tabla-estudiantes"
+          hx-encoding="multipart/form-data"
+          hx-on::after-request="this.closest('.modal-overlay').remove()">
+
+      <div class="form-group" style="margin: 1.5rem 0;">
+        <label>Seleccionar Archivo (.xlsx / .csv)</label>
+        <input type="file" name="archivo" accept=".xlsx, .xls, .csv" required
+               style="padding: 1rem; border: 2px dashed var(--c-blue-soft); background: var(--bg-main); width: 100%; border-radius: var(--radius-sm);">
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="ghost" onclick="this.closest('.modal-overlay').remove()">Cancelar</button>
+        <button type="submit" class="primary">Procesar e Importar</button>
+      </div>
+    </form>
+  </div>
+</div>

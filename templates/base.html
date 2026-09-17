@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}REIA - Realimentación Estudiantil con IA{% endblock %}</title>
+  
+  <!-- Estilos Institucionales GovLab / Universidad de la Sabana -->
+  <link rel="stylesheet" href="/static/css/style.css">
+
+  <!-- HTMX para reactividad e interactividad fluida sin recargas -->
+  <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
+
+  <!-- Chart.js para visualización de gráficas interactivas en cliente -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Scripts propios -->
+  <script src="/static/js/stt.js" defer></script>
+  <script src="/static/js/charts.js" defer></script>
+
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+  <!-- Navbar / Encabezado Oficial -->
+  <header>
+    <div class="header-inner">
+      <div class="header-brand">
+        <a href="/" style="display: flex; align-items: center; gap: 0.8rem; text-decoration: none;">
+          <img src="/static/img/GovLab_blanco.png" alt="GovLab Universidad de la Sabana" class="header-logo">
+          <div class="header-divider"></div>
+          <div>
+            <div class="header-title">GovLab - UniSabana</div>
+            <div class="header-subtitle" style="font-size: 1.1rem; line-height: 1;">REIA</div>
+          </div>
+        </a>
+      </div>
+
+      <nav class="header-nav">
+        <a href="/estudiantes" class="nav-pill {% if active_tab == 'estudiantes' %}active{% endif %}" id="nav-estudiantes">
+          Estudiantes
+        </a>
+        <a href="/cursos-clases" class="nav-pill {% if active_tab == 'cursos_clases' %}active{% endif %}" id="nav-cursos">
+          Cursos y clases
+        </a>
+        <a href="/rubricas" class="nav-pill {% if active_tab == 'rubricas' %}active{% endif %}" id="nav-rubricas">
+          Rúbricas
+        </a>
+        <a href="/reportes" class="nav-pill {% if active_tab == 'reportes' %}active{% endif %}" id="nav-reportes">
+          Reportes
+        </a>
+        <a href="/informes" class="nav-pill {% if active_tab == 'informes' %}active{% endif %}" id="nav-informes">
+          Informes
+        </a>
+        <a href="/configuracion" class="nav-pill {% if active_tab == 'configuracion' %}active{% endif %}" id="nav-config">
+          Ajustes
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Contenedor Principal -->
+  <main id="main-content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Pie de Página Institucional -->
+  <footer class="app-footer">
+    <div><strong>REIA</strong> - Realimentación Estudiantil con Inteligencia Artificial</div>
+    <div style="margin-top: 0.2rem; opacity: 0.8;">
+      Desarrollado por el <strong>GovLab de la Universidad de la Sabana</strong> - Sistema de Evaluación Formativa con Privacidad Zero-PII
+    </div>
+  </footer>
+
+  <!-- Modal global para acciones dinámicas -->
+  <div id="modal-container"></div>
+
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>
+
