@@ -496,3 +496,71 @@ def descargar_masivo_zip(
         media_type="application/zip",
         headers={"Content-Disposition": f"attachment; filename=Informes_{safe_grupo}_{ext}.zip"}
     )
+
+# ─── CRUD Plantillas de Informe (Modelos) ───
+
+@router.get("/modelos/modal-crear", response_class=HTMLResponse)
+def modal_crear_modelo(request: Request):
+    return templates.TemplateResponse(request, "informes/modal_modelo.html", {
+        "modelo": None
+    })
+
+@router.get("/modelos/modal-editar/{modelo_id}", response_class=HTMLResponse)
+def modal_editar_modelo(modelo_id: int, request: Request, db: Session = Depends(get_db)):
+    modelo = db.query(ModeloInforme).filter_by(id=modelo_id).first()
+    return templates.TemplateResponse(request, "informes/modal_modelo.html", {
+        "modelo": modelo
+    })
+
+@router.post("/modelos", response_class=HTMLResponse)
+def crear_modelo(
+    request: Request,
+    nombre: str = Form(...),
+    tipo_informe: str = Form("INDIVIDUAL"),
+    descripcion: str = Form(""),
+    prompt_base: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    nuevo = ModeloInforme(
+        nombre=nombre.strip(),
+        tipo_informe=tipo_informe,
+        descripcion=descripcion.strip(),
+        prompt_base=prompt_base.strip()
+    )
+    db.add(nuevo)
+    db.commit()
+    modelos = db.query(ModeloInforme).order_by(ModeloInforme.id).all()
+    return templates.TemplateResponse(request, "informes/tarjetas_modelos.html", {
+        "modelos": modelos
+    })
+
+@router.post("/modelos/{modelo_id}", response_class=HTMLResponse)
+def actualizar_modelo(
+    modelo_id: int,
+    request: Request,
+    nombre: str = Form(...),
+    tipo_informe: str = Form("INDIVIDUAL"),
+    descripcion: str = Form(""),
+    prompt_base: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    modelo = db.query(ModeloInforme).filter_by(id=modelo_id).first()
+    if modelo:
+        modelo.nombre = nombre.strip()
+        modelo.tipo_informe = tipo_informe
+        modelo.descripcion = descripcion.strip()
+        modelo.prompt_base = prompt_base.strip()
+        db.commit()
+    modelos = db.query(ModeloInforme).order_by(ModeloInforme.id).all()
+    return templates.TemplateResponse(request, "informes/tarjetas_modelos.html", {
+        "modelos": modelos
+    })
+
+@router.delete("/modelos/{modelo_id}")
+def eliminar_modelo(modelo_id: int, db: Session = Depends(get_db)):
+    modelo = db.query(ModeloInforme).filter_by(id=modelo_id).first()
+    if modelo:
+        db.delete(modelo)
+        db.commit()
+    return Response(status_code=200)
+

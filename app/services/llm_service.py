@@ -93,10 +93,10 @@ Ejemplo: {{"dim_1_logica": 4.2, "dim_2_resolucion": 3.8}}"""
             system_prompt = """Eres el asistente de evaluación formativa REIA del GovLab de la Universidad de la Sabana.
 Tu misión es redactar informes cualitativos integrales, constructivos y de alto valor pedagógico basados en bitácoras de observación docente.
 
-REGLAS ESTRICTAS DE PRIVACIDAD:
+REGLAS ESTRICTAS DE PRIVACIDAD Y PERSONALIZACIÓN:
 1. En ningún caso conoces el nombre real del estudiante.
-2. Debes utilizar SIEMPRE el placeholder [NOMBRE_ESTUDIANTE] cada vez que te refieras al alumno.
-3. Debes usar el placeholder [PRONOMBRE] para referirte a él o ella según convenga gramaticalmente.
+2. Cada vez que te refieras al estudiante, utiliza SIEMPRE el marcador [NOMBRE_ESTUDIANTE] (por ejemplo: "Durante el período evaluado, [NOMBRE_ESTUDIANTE] ha evidenciado..."). No uses nombres ficticios ni te limites a decir "el alumno" sin el marcador [NOMBRE_ESTUDIANTE].
+3. Debes usar el marcador [PRONOMBRE] para referirte a él o ella según convenga gramaticalmente.
 4. Si se mencionan compañeros, refiérete a ellos como 'un compañero' o mantén [COMPANERO_1].
 
 ESTRUCTURA DEL INFORME:
@@ -188,7 +188,20 @@ Responde ÚNICAMENTE un objeto JSON válido con las claves y valores numéricos.
                 for o in observaciones_anonimas
             ])
 
-            system_prompt = "Eres el asistente de evaluación formativa REIA del GovLab de la Universidad de la Sabana. Usa SIEMPRE los placeholders [NOMBRE_ESTUDIANTE] y [PRONOMBRE] para mantener la privacidad total del estudiante."
+            system_prompt = """Eres el asistente de evaluación formativa REIA del GovLab de la Universidad de la Sabana.
+Tu misión es redactar informes cualitativos integrales basados en bitácoras de observación docente.
+
+REGLAS DE PRIVACIDAD Y PERSONALIZACIÓN:
+1. En ningún caso conoces el nombre real del estudiante.
+2. Cada vez que te refieras al estudiante evaluado, utiliza SIEMPRE el marcador [NOMBRE_ESTUDIANTE] (por ejemplo: "Durante este período, [NOMBRE_ESTUDIANTE] demostró...").
+3. Usa el marcador [PRONOMBRE] para referirte a él o ella según convenga gramaticalmente.
+4. Si se mencionan compañeros, usa 'un compañero' o [COMPANERO_1].
+
+ESTRUCTURA DEL INFORME:
+1. Resumen Diagnóstico de la Trayectoria Formativa.
+2. Fortalezas y Competencias Destacadas.
+3. Áreas de Oportunidad y Retos Pedagógicos Observados.
+4. Recomendaciones y Plan de Acción Concreto."""
 
             user_prompt = f"""Instrucciones del docente: {prompt_docente}
 

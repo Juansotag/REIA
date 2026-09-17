@@ -1,0 +1,41 @@
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem;">
+  {% for m in modelos %}
+  <div class="coaching-item" style="border-left-color: var(--c-blue-dark); margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between;">
+    <div>
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.3rem; gap: 0.5rem;">
+        <strong style="color: var(--c-blue-dark); font-size: var(--fs-md);">{{ m.nombre }}</strong>
+        <span class="resultado-badge acuerdo" style="font-size: 0.7rem; white-space: nowrap;">{{ m.tipo_informe }}</span>
+      </div>
+      <p style="font-size: var(--fs-sm); color: var(--text-secondary); margin-bottom: 0.6rem;">
+        {{ m.descripcion or "Sin descripción" }}
+      </p>
+      <div style="background: #fff; padding: 0.6rem; border-radius: 4px; font-size: var(--fs-xs); color: var(--text-muted); border: 1px solid var(--border-color); margin-bottom: 0.8rem; font-style: italic; max-height: 100px; overflow-y: auto;">
+        "{{ m.prompt_base }}"
+      </div>
+    </div>
+    <div style="display: flex; gap: 0.4rem; border-top: 1px solid var(--border-color); padding-top: 0.6rem; margin-top: auto;">
+      <button type="button" class="primary" style="font-size: var(--fs-xs); padding: 0.35rem 0.65rem; flex: 1;"
+              onclick="aplicarPlantilla('{{ m.tipo_informe }}', '{{ m.prompt_base | replace('\'', '\\\'') | replace('\"', '\\\"') | replace('\n', ' ') }}')">
+        Usar Plantilla
+      </button>
+      <button type="button" class="secondary" style="font-size: var(--fs-xs); padding: 0.35rem 0.65rem;"
+              hx-get="/informes/modelos/modal-editar/{{ m.id }}"
+              hx-target="#modal-container"
+              hx-swap="innerHTML">
+        Editar
+      </button>
+      <button type="button" class="danger" style="background: #96272D; color: #FFFFFF !important; font-size: var(--fs-xs); padding: 0.35rem 0.65rem; border: none; font-weight: 600;"
+              hx-delete="/informes/modelos/{{ m.id }}"
+              hx-confirm="¿Está seguro de eliminar esta plantilla de informe?"
+              hx-target="closest .coaching-item"
+              hx-swap="outerHTML">
+        Eliminar
+      </button>
+    </div>
+  </div>
+  {% else %}
+  <div style="grid-column: 1 / -1; padding: 2rem; text-align: center; color: var(--text-muted); background: var(--bg-main); border-radius: var(--radius-sm);">
+    No hay plantillas de informe registradas. Haga clic en <strong>"+ Nueva Plantilla de Informe"</strong> para crear una.
+  </div>
+  {% endfor %}
+</div>

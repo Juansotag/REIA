@@ -82,29 +82,18 @@
     <div class="card-header-row">
       <div>
         <h3>Modelos y Plantillas de Informe Preconfiguradas</h3>
-        <div class="card-description">Plantillas pedagógicas diseñadas por el GovLab para agilizar la redacción.</div>
+        <div class="card-description">Plantillas pedagógicas para agilizar la redacción de informes con IA. Puede crear, editar o eliminar modelos.</div>
       </div>
+      <button type="button" class="primary" style="padding: 0.4rem 0.85rem; font-size: var(--fs-xs);"
+              hx-get="/informes/modelos/modal-crear"
+              hx-target="#modal-container"
+              hx-swap="innerHTML">
+        + Nueva Plantilla de Informe
+      </button>
     </div>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem;">
-      {% for m in modelos %}
-      <div class="coaching-item" style="border-left-color: var(--c-blue-dark); margin-bottom: 0;">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
-          <strong style="color: var(--c-blue-dark);">{{ m.nombre }}</strong>
-          <span class="resultado-badge acuerdo" style="font-size: 0.7rem;">{{ m.tipo_informe }}</span>
-        </div>
-        <p style="font-size: var(--fs-sm); color: var(--text-secondary); margin-bottom: 0.6rem;">
-          {{ m.descripcion }}
-        </p>
-        <div style="background: #fff; padding: 0.6rem; border-radius: 4px; font-size: var(--fs-xs); color: var(--text-muted); border: 1px solid var(--border-color); margin-bottom: 0.6rem; font-style: italic;">
-          "{{ m.prompt_base }}"
-        </div>
-        <button type="button" class="secondary" style="font-size: var(--fs-xs); padding: 0.35rem 0.8rem; width: 100%;"
-                onclick="aplicarPlantilla('{{ m.tipo_informe }}', '{{ m.prompt_base | replace('\'', '\\\'') | replace('\"', '\\\"') }}')">
-          Usar esta Plantilla
-        </button>
-      </div>
-      {% endfor %}
+    <div id="contenedor-tarjetas-modelos">
+      {% include "informes/tarjetas_modelos.html" %}
     </div>
   </div>
 </div>

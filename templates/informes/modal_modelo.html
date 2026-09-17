@@ -1,0 +1,50 @@
+<div class="modal-overlay" onclick="if(event.target===this) this.remove()">
+  <div class="modal-box" style="max-width: 650px; max-height: 90vh; overflow-y: auto;">
+    <div class="modal-header">
+      <h3>{% if modelo %}Editar Plantilla de Informe{% else %}Nueva Plantilla de Informe{% endif %}</h3>
+      <button type="button" class="modal-close" onclick="this.closest('.modal-overlay').remove()">x</button>
+    </div>
+
+    <form method="POST" action="{% if modelo %}/informes/modelos/{{ modelo.id }}{% else %}/informes/modelos{% endif %}"
+          hx-post="{% if modelo %}/informes/modelos/{{ modelo.id }}{% else %}/informes/modelos{% endif %}"
+          hx-target="#contenedor-tarjetas-modelos"
+          hx-swap="innerHTML"
+          onsubmit="setTimeout(() => { const m = this.closest('.modal-overlay'); if(m) m.remove(); }, 150);">
+
+      <div class="form-group" style="margin-bottom: 0.85rem;">
+        <label for="mod_nombre" style="font-weight: 700; color: var(--c-blue-dark); font-size: var(--fs-sm);">Nombre de la Plantilla *</label>
+        <input type="text" id="mod_nombre" name="nombre" value="{{ modelo.nombre if modelo else '' }}" placeholder="Ej. Informe Formativo para Familias" required style="width: 100%;">
+      </div>
+
+      <div class="form-group" style="margin-bottom: 0.85rem;">
+        <label for="mod_tipo" style="font-weight: 700; color: var(--c-blue-dark); font-size: var(--fs-sm);">Tipo de Informe *</label>
+        <select id="mod_tipo" name="tipo_informe" required style="width: 100%;">
+          <option value="INDIVIDUAL" {% if not modelo or modelo.tipo_informe == 'INDIVIDUAL' %}selected{% endif %}>
+            Individual (Por Estudiante)
+          </option>
+          <option value="AGREGADO" {% if modelo and modelo.tipo_informe == 'AGREGADO' %}selected{% endif %}>
+            Agregado (Por Curso / Grupo)
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 0.85rem;">
+        <label for="mod_desc" style="font-weight: 700; color: var(--c-blue-dark); font-size: var(--fs-sm);">Descripción Pedagógica</label>
+        <input type="text" id="mod_desc" name="descripcion" value="{{ modelo.descripcion if modelo else '' }}" placeholder="Breve resumen del objetivo de esta plantilla..." style="width: 100%;">
+      </div>
+
+      <div class="form-group" style="margin-bottom: 1rem;">
+        <label for="mod_prompt" style="font-weight: 700; color: var(--c-blue-dark); font-size: var(--fs-sm);">Instrucciones / Prompt Base para la IA *</label>
+        <textarea id="mod_prompt" name="prompt_base" rows="5" placeholder="Escriba las directrices de tono, estructura y enfoque para la IA..." required style="width: 100%; border: 1.5px solid var(--c-blue-tint); border-radius: var(--radius-sm); padding: 0.5rem; font-family: inherit; font-size: var(--fs-sm);">{{ modelo.prompt_base if modelo else '' }}</textarea>
+        <div style="font-size: var(--fs-xs); color: var(--text-muted); margin-top: 0.3rem;">
+          Variables automáticas soportadas: <code>[NOMBRE_ESTUDIANTE]</code>, <code>[PRONOMBRE]</code>, <code>[GRADO]</code>. El sistema las reemplazará automáticamente con los datos reales del estudiante.
+        </div>
+      </div>
+
+      <div class="modal-actions" style="display: flex; justify-content: flex-end; gap: 0.5rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+        <button type="button" class="ghost" onclick="this.closest('.modal-overlay').remove()">Cancelar</button>
+        <button type="submit" class="primary">{% if modelo %}Actualizar Plantilla{% else %}Crear Plantilla{% endif %}</button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -151,4 +151,14 @@ class PrivacyService:
         resultado = re.sub(r"\[EDAD\]", str(getattr(estudiante, "edad", "")), resultado, flags=re.IGNORECASE)
         resultado = re.sub(r"\[GRADO\]", f"{getattr(estudiante, 'grado_actual', '')}º Grado", resultado, flags=re.IGNORECASE)
 
+        # Respaldo inteligente: si el modelo redactó en prosa genérica sin corchetes y el nombre no figura:
+        if nombre_completo not in resultado:
+            resultado = re.sub(
+                r"\b(el\s+estudiante|la\s+estudiante|el\s+alumno|la\s+alumna)\b",
+                f"\\1 {nombre_completo}",
+                resultado,
+                count=1,
+                flags=re.IGNORECASE
+            )
+
         return resultado

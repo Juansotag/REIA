@@ -202,5 +202,51 @@ def test_eliminar_informe_guardado():
     else:
         db.close()
 
+def test_crud_modelos_informe():
+    # 1. Modal crear plantilla
+    res_modal = client.get("/informes/modelos/modal-crear")
+    assert res_modal.status_code == 200
+    assert "Nueva Plantilla de Informe" in res_modal.text
+
+    # 2. Crear nueva plantilla
+    res_crear = client.post("/informes/modelos", data={
+        "nombre": "Plantilla Test Creatividad",
+        "tipo_informe": "INDIVIDUAL",
+        "descripcion": "Plantilla de prueba para proyectos",
+        "prompt_base": "Evaluar la creatividad de [NOMBRE_ESTUDIANTE] en proyectos."
+    })
+    assert res_crear.status_code == 200
+    assert "Plantilla Test Creatividad" in res_crear.text
+
+    # 3. Obtener id de la plantilla creada
+    from app.database import SessionLocal
+    from app.models import ModeloInforme
+    db = SessionLocal()
+    mod = db.query(ModeloInforme).filter_by(nombre="Plantilla Test Creatividad").first()
+    assert mod is not None
+    mod_id = mod.id
+    db.close()
+
+    # 4. Modal editar plantilla
+    res_edit_modal = client.get(f"/informes/modelos/modal-editar/{mod_id}")
+    assert res_edit_modal.status_code == 200
+    assert "Editar Plantilla de Informe" in res_edit_modal.text
+    assert "Plantilla Test Creatividad" in res_edit_modal.text
+
+    # 5. Actualizar plantilla
+    res_update = client.post(f"/informes/modelos/{mod_id}", data={
+        "nombre": "Plantilla Test Creatividad Editada",
+        "tipo_informe": "INDIVIDUAL",
+        "descripcion": "Descripción editada",
+        "prompt_base": "Evaluar la creatividad e innovación de [NOMBRE_ESTUDIANTE]."
+    })
+    assert res_update.status_code == 200
+    assert "Plantilla Test Creatividad Editada" in res_update.text
+
+    # 6. Eliminar plantilla
+    res_del = client.delete(f"/informes/modelos/{mod_id}")
+    assert res_del.status_code == 200
+
+
 
 
