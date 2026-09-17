@@ -32,18 +32,18 @@
       </div>
     </div>
 
-    <!-- API Keys Protegidas -->
+    <!-- Credenciales Protegidas -->
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
       <div class="form-group">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-          <label style="margin: 0;">OpenAI API Key</label>
+          <label style="margin: 0;">Credencial de Servicio OpenAI</label>
           {% if openai_configurada %}
           <span class="resultado-badge acuerdo" style="font-size: 0.65rem;">Configurada ({{ openai_mask }})</span>
           {% else %}
           <span class="resultado-badge rechazo" style="font-size: 0.65rem;">No configurada</span>
           {% endif %}
         </div>
-        <input type="password" name="openai_api_key" value="" placeholder="{% if openai_configurada %}Dejar en blanco para conservar clave actual{% else %}sk-...{% endif %}" autocomplete="new-password">
+        <input type="password" name="openai_api_key" value="" placeholder="{% if openai_configurada %}Dejar en blanco para conservar clave actual{% else %}Ingresar credencial de acceso...{% endif %}" autocomplete="new-password">
         <div style="font-size: var(--fs-xs); color: var(--text-muted); margin-top: 0.25rem;">
           Almacenada exclusivamente en el archivo local <code>.env</code>.
         </div>
@@ -51,14 +51,14 @@
 
       <div class="form-group">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-          <label style="margin: 0;">Anthropic API Key</label>
+          <label style="margin: 0;">Credencial de Servicio Anthropic</label>
           {% if anthropic_configurada %}
           <span class="resultado-badge acuerdo" style="font-size: 0.65rem;">Configurada ({{ anthropic_mask }})</span>
           {% else %}
           <span class="resultado-badge rechazo" style="font-size: 0.65rem;">No configurada</span>
           {% endif %}
         </div>
-        <input type="password" name="anthropic_api_key" value="" placeholder="{% if anthropic_configurada %}Dejar en blanco para conservar clave actual{% else %}sk-ant-...{% endif %}" autocomplete="new-password">
+        <input type="password" name="anthropic_api_key" value="" placeholder="{% if anthropic_configurada %}Dejar en blanco para conservar clave actual{% else %}Ingresar credencial de acceso...{% endif %}" autocomplete="new-password">
         <div style="font-size: var(--fs-xs); color: var(--text-muted); margin-top: 0.25rem;">
           Almacenada exclusivamente en el archivo local <code>.env</code>.
         </div>

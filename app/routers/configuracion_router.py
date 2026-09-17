@@ -52,7 +52,7 @@ def guardar_configuracion(
     # Solo actualizar OpenAI si el usuario ingresó una nueva clave
     nueva_openai = openai_api_key.strip()
     if nueva_openai:
-        if nueva_openai.upper() in ["DELETE", "BORRAR", "ELIMINAR"]:
+        if nueva_openai.upper() in ["DELETE", "BORRAR", "ELIMINAR", "__BORRAR__", "CLEAR", "NONE"]:
             os.environ["OPENAI_API_KEY"] = ""
             try:
                 set_key(env_path, "OPENAI_API_KEY", "")
@@ -68,7 +68,7 @@ def guardar_configuracion(
     # Solo actualizar Anthropic si el usuario ingresó una nueva clave
     nueva_anthropic = anthropic_api_key.strip()
     if nueva_anthropic:
-        if nueva_anthropic.upper() in ["DELETE", "BORRAR", "ELIMINAR"]:
+        if nueva_anthropic.upper() in ["DELETE", "BORRAR", "ELIMINAR", "__BORRAR__", "CLEAR", "NONE"]:
             os.environ["ANTHROPIC_API_KEY"] = ""
             try:
                 set_key(env_path, "ANTHROPIC_API_KEY", "")

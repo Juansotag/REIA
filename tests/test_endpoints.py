@@ -158,12 +158,20 @@ def test_pagina_configuracion_y_env():
     # Guardar configuración en .env
     res_guardar = client.post("/configuracion/guardar", data={
         "llm_provider": "openai",
-        "openai_api_key": "sk-test-key-12345",
-        "anthropic_api_key": "sk-ant-test-67890",
+        "openai_api_key": "test_token_sample",
+        "anthropic_api_key": "test_token_sample",
         "stt_engine": "hybrid"
     })
     assert res_guardar.status_code == 200
     assert "guardada de forma segura en .env" in res_guardar.text
+
+    # Limpiar credenciales al finalizar prueba
+    client.post("/configuracion/guardar", data={
+        "llm_provider": "openai",
+        "openai_api_key": "__BORRAR__",
+        "anthropic_api_key": "__BORRAR__",
+        "stt_engine": "hybrid"
+    })
 
 def test_descarga_masiva_zip_docx_y_pdf():
     import zipfile

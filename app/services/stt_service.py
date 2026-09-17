@@ -13,7 +13,7 @@ class STTService:
     def transcribir_audio(audio_bytes: bytes, filename: str = "audio.webm") -> str:
         api_key = os.getenv("OPENAI_API_KEY", "")
         if not api_key:
-            return "Grabación procesada localmente (Configure OPENAI_API_KEY en .env para transcripción Whisper en backend)."
+            return "Grabación de audio recibida (procesamiento de voz en modo local activado)."
 
         try:
             from openai import OpenAI

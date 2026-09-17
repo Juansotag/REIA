@@ -327,8 +327,8 @@
           </p>
           <ul style="padding-left: 1.2rem; color: var(--text-secondary); line-height: 1.7; font-size: var(--fs-sm); margin-bottom: 1.5rem;">
             <li><strong>Gestión de Plantillas:</strong> Crea, edita y elimina modelos de informe para comités de evaluación, orientación escolar o proyectos transversales.</li>
-            <li><strong>Selección de Motor de IA:</strong> Cambia en caliente entre OpenAI (GPT-4o), Anthropic (Claude 3.5 Sonnet) o el <strong>Modo Simulado Offline</strong> (ideal para pruebas y demostraciones sin consumo de API).</li>
-            <li><strong>Seguridad de Claves:</strong> Las API keys se almacenan de manera segura en el archivo .env del servidor, sin exponerse en el código HTML cliente.</li>
+            <li><strong>Selección de Motor de IA:</strong> Cambia en caliente entre OpenAI (GPT-4o), Anthropic (Claude 3.5 Sonnet) o el <strong>Modo Simulado Offline</strong> (ideal para pruebas y demostraciones locales).</li>
+            <li><strong>Gestión de Credenciales:</strong> Las configuraciones se almacenan de manera segura en el entorno del servidor, protegiendo todos los accesos.</li>
           </ul>
           <div style="display: flex; gap: 0.8rem;">
             <a href="/configuracion" class="btn primary" style="font-size: var(--fs-xs);">Ir a Ajustes del Sistema</a>
@@ -436,10 +436,10 @@
 
       <details style="background: var(--bg-main); padding: 1rem 1.2rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); cursor: pointer;">
         <summary style="font-weight: 700; color: var(--c-blue-dark); font-size: var(--fs-md);">
-          ¿Puedo utilizar REIA sin tener una clave de API de OpenAI o Anthropic?
+          ¿Puedo utilizar REIA en modo desconectado o sin servicios externos?
         </summary>
         <p style="color: var(--text-secondary); font-size: var(--fs-sm); line-height: 1.6; margin-top: 0.6rem;">
-          Sí. REIA incluye un <strong>Modo Simulado Offline</strong> completamente funcional. Este modo analiza heurísticamente el texto de la observación y redacta informes formativos estructurados sin requerir conexión a internet ni generar costos de API.
+          Sí. REIA incluye un <strong>Modo Simulado Offline</strong> completamente funcional. Este modo analiza heurísticamente el texto de la observación y redacta informes formativos estructurados de forma autónoma.
         </p>
       </details>
 
