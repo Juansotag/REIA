@@ -90,10 +90,11 @@ Ejemplo: {{"dim_1_logica": 4.2, "dim_2_resolucion": 3.8}}"""
                 for o in observaciones_anonimas
             ])
 
-            system_prompt = """Eres el asistente de evaluación formativa REIA del GovLab de la Universidad de la Sabana.
-Tu misión es redactar informes cualitativos integrales, constructivos y de alto valor pedagógico basados en bitácoras de observación docente.
+            if es_individual:
+                system_prompt = """Eres el asistente de evaluación formativa REIA del GovLab de la Universidad de la Sabana.
+Tu misión es redactar informes cualitativos individuales, integrales, constructivos y de alto valor pedagógico basados en bitácoras de observación docente.
 
-REGLAS ESTRICTAS DE PRIVACIDAD Y PERSONALIZACIÓN:
+REGLAS ESTRICTAS DE PRIVACIDAD Y PERSONALIZACIÓN INDIVIDUAL:
 1. En ningún caso conoces el nombre real del estudiante.
 2. Cada vez que te refieras al estudiante, utiliza SIEMPRE el marcador [NOMBRE_ESTUDIANTE] (por ejemplo: "Durante el período evaluado, [NOMBRE_ESTUDIANTE] ha evidenciado..."). No uses nombres ficticios ni te limites a decir "el alumno" sin el marcador [NOMBRE_ESTUDIANTE].
 3. Debes usar el marcador [PRONOMBRE] para referirte a él o ella según convenga gramaticalmente.
@@ -105,13 +106,36 @@ ESTRUCTURA DEL INFORME:
 3. Áreas de Oportunidad y Retos Pedagógicos Observados.
 4. Recomendaciones y Plan de Acción Concreto."""
 
-            user_prompt = f"""Instrucción particular del docente:
+                user_prompt = f"""Instrucción particular del docente:
 {prompt_docente}
 
 Observaciones registradas en el período:
 {obs_texto}
 
-Redacta el informe con tono empático, riguroso y formal."""
+Redacta el informe individual con tono empático, riguroso y formal."""
+            else:
+                system_prompt = """Eres el asistente de evaluación formativa REIA del GovLab de la Universidad de la Sabana.
+Tu misión es redactar un informe colectivo de aula / curso institucional, analizando las tendencias grupales, la convivencia, los logros de aprendizaje colectivos y las dinámicas del grupo basadas en la bitácora de observaciones de la cohorte.
+
+REGLAS ESTRICTAS PARA INFORMES COLECTIVOS DE AULA / CURSO:
+1. Este es un informe GRUPAL / COLECTIVO DE AULA para todo el curso o cohorte, NO para un estudiante individual.
+2. NUNCA utilices [NOMBRE_ESTUDIANTE] ni hables en términos de un solo estudiante. Refiérete siempre al "grupo", "la clase", "el curso", "los estudiantes" o "la cohorte".
+3. Sintetiza los patrones comunes observados en el aula, las dinámicas de participación grupal, el clima de convivencia y los logros y retos compartidos.
+4. Formula recomendaciones pedagógicas orientadas a la gestión docente, trabajo en equipo, metodologías de aula y articulación con el director de curso.
+
+ESTRUCTURA DEL INFORME COLECTIVO DE AULA:
+1. Diagnóstico General y Clima de Aula del Grupo.
+2. Fortalezas Colectivas y Competencias Grupales Destacadas.
+3. Retos Pedagógicos y Convivenciales del Curso.
+4. Estrategias y Recomendaciones Pedagógicas para el Equipo Docente."""
+
+                user_prompt = f"""Instrucción particular del docente / directivo:
+{prompt_docente}
+
+Bitácora de observaciones del curso en el período:
+{obs_texto}
+
+Redacta el informe colectivo de aula con tono profesional, constructivo, riguroso y pedagógico."""
 
             response = client.chat.completions.create(
                 model=self.model,
@@ -188,10 +212,11 @@ Responde ÚNICAMENTE un objeto JSON válido con las claves y valores numéricos.
                 for o in observaciones_anonimas
             ])
 
-            system_prompt = """Eres el asistente de evaluación formativa REIA del GovLab de la Universidad de la Sabana.
-Tu misión es redactar informes cualitativos integrales basados en bitácoras de observación docente.
+            if es_individual:
+                system_prompt = """Eres el asistente de evaluación formativa REIA del GovLab de la Universidad de la Sabana.
+Tu misión es redactar informes cualitativos individuales, integrales y constructivos basados en bitácoras de observación docente.
 
-REGLAS DE PRIVACIDAD Y PERSONALIZACIÓN:
+REGLAS DE PRIVACIDAD Y PERSONALIZACIÓN INDIVIDUAL:
 1. En ningún caso conoces el nombre real del estudiante.
 2. Cada vez que te refieras al estudiante evaluado, utiliza SIEMPRE el marcador [NOMBRE_ESTUDIANTE] (por ejemplo: "Durante este período, [NOMBRE_ESTUDIANTE] demostró...").
 3. Usa el marcador [PRONOMBRE] para referirte a él o ella según convenga gramaticalmente.
@@ -203,12 +228,34 @@ ESTRUCTURA DEL INFORME:
 3. Áreas de Oportunidad y Retos Pedagógicos Observados.
 4. Recomendaciones y Plan de Acción Concreto."""
 
-            user_prompt = f"""Instrucciones del docente: {prompt_docente}
+                user_prompt = f"""Instrucciones del docente: {prompt_docente}
 
 Observaciones del período:
 {obs_texto}
 
-Redacta un informe formativo completo con: Diagnóstico general, Fortalezas, Aspectos por Mejorar y Recomendaciones Pedagógicas."""
+Redacta un informe formativo individual completo con: Diagnóstico general, Fortalezas, Aspectos por Mejorar y Recomendaciones Pedagógicas."""
+            else:
+                system_prompt = """Eres el asistente de evaluación formativa REIA del GovLab de la Universidad de la Sabana.
+Tu misión es redactar un informe pedagógico colectivo de aula / curso institucional, analizando las tendencias grupales, la convivencia, los logros de aprendizaje colectivos y las dinámicas del grupo basadas en la bitácora de observaciones de la cohorte.
+
+REGLAS ESTRICTAS PARA INFORMES COLECTIVOS DE AULA / CURSO:
+1. Este es un informe GRUPAL / COLECTIVO DE AULA para todo el curso o cohorte, NO para un estudiante individual.
+2. NUNCA utilices [NOMBRE_ESTUDIANTE] ni hables en términos de un solo estudiante. Refiérete siempre al "grupo", "la clase", "el curso", "los estudiantes" o "la cohorte".
+3. Sintetiza los patrones comunes observados en el aula, las dinámicas de participación grupal, el clima de convivencia y los logros y retos compartidos.
+4. Formula recomendaciones pedagógicas orientadas a la gestión docente, trabajo en equipo, metodologías de aula y articulación con el director de curso.
+
+ESTRUCTURA DEL INFORME COLECTIVO DE AULA:
+1. Diagnóstico General y Clima de Aula del Grupo.
+2. Fortalezas Colectivas y Competencias Grupales Destacadas.
+3. Retos Pedagógicos y Convivenciales del Curso.
+4. Estrategias y Recomendaciones Pedagógicas para el Equipo Docente."""
+
+                user_prompt = f"""Instrucciones del docente / directivo: {prompt_docente}
+
+Bitácora de observaciones del curso en el período:
+{obs_texto}
+
+Redacta un informe colectivo de aula completo con: Diagnóstico general del clima de aula, Fortalezas colectivas, Retos del curso y Recomendaciones pedagógicas grupales."""
 
             response = client.messages.create(
                 model=self.model,
@@ -267,15 +314,19 @@ class SimuladoLLMService(BaseLLMService):
             )
         else:
             return (
-                "### 1. Resumen del Desempeño y Clima de Aula Colectivo\n"
-                "El grupo escolar ha demostrado un comportamiento académico y convivencial en consonancia con los objetivos del plan de estudios. "
-                "Se observa una distribución equilibrada en los niveles de desempeño, con una media general que se posiciona en el rango Alto de la escala institucional.\n\n"
-                "### 2. Tendencias y Logros Grupales\n"
-                "- Alta motivación en actividades prácticas y debates participativos.\n"
-                "- Cohesión grupal sólida y capacidad para resolver diferencias menores mediante el diálogo mediado.\n\n"
-                "### 3. Retos Colectivos y Plan de Mejora\n"
-                "- Profundizar en la lectura crítica y la precisión procedimental.\n"
-                "- Fomentar la puntualidad en la entrega de compromisos y la autorregulación en los momentos de transición entre clases."
+                "### 1. Diagnóstico General y Clima de Aula del Grupo\n"
+                "A lo largo del período evaluado, el grupo de estudiantes ha demostrado un proceso dinámico y participativo en las diferentes actividades curriculares. Se observa un clima de aula propicio para el aprendizaje colaborativo, con una notable disposición hacia el diálogo pedagógico y la construcción colectiva del conocimiento.\n\n"
+                "### 2. Fortalezas Colectivas y Competencias Grupales Destacadas\n"
+                "- **Trabajo Colaborativo y Cohesión**: Los estudiantes demuestran gran capacidad para integrarse en equipos de trabajo, asumiendo roles con responsabilidad y apoyándose mutuamente en el logro de metas comunes.\n"
+                "- **Participación Activa y Pensamiento Crítico**: Se evidencia iniciativa para plantear inquietudes fundamentadas y enriquecer las discusiones en clase con argumentos sólidos.\n"
+                "- **Apropiación Conceptual**: En la mayoría de las áreas evaluadas, el curso exhibe un dominio consistente de los conceptos clave y habilidad para aplicarlos en contextos prácticos.\n\n"
+                "### 3. Retos Pedagógicos y Convivenciales del Curso\n"
+                "- **Autorregulación y Concentración Colectiva**: En momentos de transición entre actividades o sesiones extensas, se requiere afianzar la gestión del tiempo y la atención sostenida de todo el grupo.\n"
+                "- **Manejo de Diferencias y Comunicación Asertiva**: Aunque la convivencia es en general positiva, se recomienda continuar fortaleciendo las habilidades socioemocionales para la mediación pacífica ante discrepancias de opinión.\n\n"
+                "### 4. Estrategias y Recomendaciones Pedagógicas para el Equipo Docente\n"
+                "- Implementar metodologías activas y proyectos interdisciplinarios que canalicen el liderazgo y la energía del curso de manera constructiva.\n"
+                "- Establecer acuerdos pedagógicos explícitos al inicio de cada bloque temático para optimizar la autorregulación grupal.\n"
+                "- Mantener canales fluidos de retroalimentación formativa y articulación continua con la dirección de grupo y las familias."
             )
 
 def get_llm_service(provider: str = None) -> BaseLLMService:

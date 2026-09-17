@@ -3,10 +3,16 @@ from app.main import app
 
 client = TestClient(app)
 
-def test_ruta_raiz_redirect():
-    response = client.get("/", follow_redirects=False)
-    assert response.status_code in [302, 307]
-    assert response.headers["location"] == "/reportes"
+def test_landing_page_y_tutorial():
+    response = client.get("/")
+    assert response.status_code == 200
+    assert "Realimentación Estudiantil con Inteligencia Artificial" in response.text
+    assert "Tutorial: Cómo Funciona REIA Paso a Paso" in response.text
+    assert "Simulador Interactivo: Flujo de Anonimización Zero-PII" in response.text
+
+    # Probar alias /inicio y /tutorial
+    assert client.get("/inicio").status_code == 200
+    assert client.get("/tutorial").status_code == 200
 
 def test_pagina_estudiantes():
     response = client.get("/estudiantes")

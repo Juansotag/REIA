@@ -5,6 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
 from app.database import init_db
 from app.routers import (
+    landing_router,
     estudiantes_router,
     cursos_clases_router,
     rubricas_router,
@@ -31,6 +32,7 @@ app = FastAPI(
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Incluir routers de la aplicación
+app.include_router(landing_router)
 app.include_router(estudiantes_router)
 app.include_router(cursos_clases_router)
 app.include_router(rubricas_router)
@@ -38,10 +40,6 @@ app.include_router(reportes_router)
 app.include_router(informes_router)
 app.include_router(configuracion_router)
 app.include_router(stt_router)
-
-@app.get("/")
-def ruta_raiz():
-    return RedirectResponse(url="/reportes")
 
 if __name__ == "__main__":
     import uvicorn

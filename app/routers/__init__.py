@@ -5,8 +5,10 @@ from app.routers.reportes_router import router as reportes_router
 from app.routers.informes_router import router as informes_router
 from app.routers.configuracion_router import router as configuracion_router
 from app.routers.stt_router import router as stt_router
+from app.routers.landing_router import router as landing_router
 
 __all__ = [
+    "landing_router",
     "estudiantes_router",
     "cursos_clases_router",
     "rubricas_router",

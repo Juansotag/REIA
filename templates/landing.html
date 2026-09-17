@@ -1,0 +1,524 @@
+{% extends "base.html" %}
+
+{% block title %}REIA - Plataforma de Realimentación Estudiantil con IA | GovLab UniSabana{% endblock %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 0 auto; padding: 1.5rem 1rem;">
+
+  <!-- Hero Section Institucional -->
+  <section class="card" style="background: linear-gradient(135deg, #00135B 0%, #002B66 100%); color: #FFFFFF; border: none; padding: 3rem 2.5rem; margin-bottom: 2.5rem; border-radius: var(--radius); box-shadow: 0 10px 30px rgba(0, 19, 91, 0.25);">
+    <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 2.5rem; align-items: center;">
+      <div>
+        <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255, 255, 255, 0.12); padding: 0.35rem 0.9rem; border-radius: 20px; font-size: var(--fs-xs); font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 1.2rem; border: 1px solid rgba(255, 255, 255, 0.2);">
+          GovLab • Universidad de la Sabana
+        </div>
+        <h1 style="color: #FFFFFF; font-size: clamp(2rem, 3.5vw, 2.8rem); line-height: 1.15; margin-bottom: 1rem; font-style: normal;">
+          Realimentación Estudiantil con Inteligencia Artificial
+        </h1>
+        <p style="color: #D9E1EF; font-size: 1.05rem; line-height: 1.6; margin-bottom: 2rem; max-width: 600px;">
+          Plataforma pedagógica integral para la captura ágil de observaciones docentes por voz y texto, inferencia formativa multidimensional y generación automatizada de informes oficiales en Word y PDF bajo arquitectura de privacidad <strong>Zero-PII</strong>.
+        </p>
+
+        <!-- Botones de Acción Rápida -->
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+          <a href="/reportes" class="btn primary" style="background: #f8a719; color: #00135B !important; font-weight: 700; padding: 0.85rem 1.6rem; border-radius: var(--radius-sm); font-size: var(--fs-base); border: none; box-shadow: 0 4px 12px rgba(248, 167, 25, 0.3);">
+            Ir a Bitácora de Observaciones
+          </a>
+          <a href="/informes" class="btn secondary" style="background: rgba(255, 255, 255, 0.15); color: #FFFFFF !important; font-weight: 600; padding: 0.85rem 1.6rem; border-radius: var(--radius-sm); font-size: var(--fs-base); border: 1px solid rgba(255, 255, 255, 0.3);">
+            Generar Informes Oficiales
+          </a>
+          <a href="#tutorial-guiado" class="btn secondary" style="background: transparent; color: #D9E1EF !important; font-weight: 600; padding: 0.85rem 1.4rem; border-radius: var(--radius-sm); font-size: var(--fs-base); text-decoration: underline;">
+            Ver Tutorial y Guía de Uso
+          </a>
+        </div>
+      </div>
+
+      <!-- Panel de Estadísticas y Resumen del Sistema -->
+      <div style="background: rgba(255, 255, 255, 0.08); padding: 1.8rem; border-radius: var(--radius); border: 1px solid rgba(255, 255, 255, 0.18); backdrop-filter: blur(8px);">
+        <h3 style="color: #FFFFFF; font-size: 1.1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.2); padding-bottom: 0.6rem; margin-bottom: 1.2rem;">
+          Estado Operativo del Sistema
+        </h3>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+          <div style="background: rgba(0, 19, 91, 0.4); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid rgba(255, 255, 255, 0.1);">
+            <div style="font-size: 1.8rem; font-weight: 700; color: #f8a719; line-height: 1;">{{ stats.estudiantes }}</div>
+            <div style="font-size: var(--fs-xs); color: #D9E1EF; margin-top: 0.3rem;">Estudiantes Registrados</div>
+          </div>
+          <div style="background: rgba(0, 19, 91, 0.4); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid rgba(255, 255, 255, 0.1);">
+            <div style="font-size: 1.8rem; font-weight: 700; color: #f8a719; line-height: 1;">{{ stats.cursos }}</div>
+            <div style="font-size: var(--fs-xs); color: #D9E1EF; margin-top: 0.3rem;">Cursos y Cohortes</div>
+          </div>
+          <div style="background: rgba(0, 19, 91, 0.4); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid rgba(255, 255, 255, 0.1);">
+            <div style="font-size: 1.8rem; font-weight: 700; color: #f8a719; line-height: 1;">{{ stats.reportes }}</div>
+            <div style="font-size: var(--fs-xs); color: #D9E1EF; margin-top: 0.3rem;">Observaciones Registradas</div>
+          </div>
+          <div style="background: rgba(0, 19, 91, 0.4); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid rgba(255, 255, 255, 0.1);">
+            <div style="font-size: 1.8rem; font-weight: 700; color: #f8a719; line-height: 1;">{{ stats.informes }}</div>
+            <div style="font-size: var(--fs-xs); color: #D9E1EF; margin-top: 0.3rem;">Informes Generados</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 1.2rem; font-size: var(--fs-xs); color: #D9E1EF; background: rgba(0, 19, 91, 0.3); padding: 0.6rem 0.8rem; border-radius: var(--radius-sm); border-left: 3px solid #f8a719;">
+          <strong>Protocolo de Seguridad:</strong> Arquitectura Zero-PII activa. La IA procesa únicamente tokens anonimizados.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pilares y Capacidades de REIA -->
+  <section style="margin-bottom: 3rem;">
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <h2 style="color: var(--c-blue-dark); font-size: 1.8rem; margin-bottom: 0.4rem;">
+        Pilares Fundamentales de la Plataforma
+      </h2>
+      <p style="color: var(--text-muted); font-size: var(--fs-base); max-width: 700px; margin: 0 auto;">
+        Tecnología de frontera al servicio de la docencia, combinando rigor evaluativo, protección de datos y automatización documental.
+      </p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem;">
+      
+      <!-- Pilar 1 -->
+      <div class="card" style="border-top: 4px solid var(--c-blue-dark); padding: 1.8rem 1.5rem; transition: transform var(--transition), box-shadow var(--transition);">
+        <h3 style="color: var(--c-blue-dark); font-size: 1.15rem; margin-bottom: 0.8rem;">
+          Privacidad Blindada (Zero-PII)
+        </h3>
+        <p style="color: var(--text-secondary); font-size: var(--fs-sm); line-height: 1.6;">
+          Los nombres reales, documentos e identificadores personales nunca se transmiten a los proveedores de IA. La anonimización y re-identificación ocurren de forma local y segura en la infraestructura institucional.
+        </p>
+      </div>
+
+      <!-- Pilar 2 -->
+      <div class="card" style="border-top: 4px solid #f8a719; padding: 1.8rem 1.5rem; transition: transform var(--transition), box-shadow var(--transition);">
+        <h3 style="color: var(--c-blue-dark); font-size: 1.15rem; margin-bottom: 0.8rem;">
+          Dictado por Voz en Aula
+        </h3>
+        <p style="color: var(--text-secondary); font-size: var(--fs-sm); line-height: 1.6;">
+          Agiliza la captura de evidencias en el aula mediante dictado continuo (Web Speech API del navegador) y transcripción avanzada con OpenAI Whisper para audios grabados.
+        </p>
+      </div>
+
+      <!-- Pilar 3 -->
+      <div class="card" style="border-top: 4px solid var(--c-blue-light); padding: 1.8rem 1.5rem; transition: transform var(--transition), box-shadow var(--transition);">
+        <h3 style="color: var(--c-blue-dark); font-size: 1.15rem; margin-bottom: 0.8rem;">
+          Inferencia Multidimensional
+        </h3>
+        <p style="color: var(--text-secondary); font-size: var(--fs-sm); line-height: 1.6;">
+          Los motores LLM (OpenAI GPT-4o, Anthropic Claude 3.5 o Modo Simulado Offline) analizan la narrativa del docente y sugieren automáticamente valoraciones por cada dimensión de la rúbrica.
+        </p>
+      </div>
+
+      <!-- Pilar 4 -->
+      <div class="card" style="border-top: 4px solid var(--c-red); padding: 1.8rem 1.5rem; transition: transform var(--transition), box-shadow var(--transition);">
+        <h3 style="color: var(--c-blue-dark); font-size: 1.15rem; margin-bottom: 0.8rem;">
+          Exportación Oficial y Lotes
+        </h3>
+        <p style="color: var(--text-secondary); font-size: var(--fs-sm); line-height: 1.6;">
+          Generación instantánea de informes formales con membrete de la Universidad de la Sabana, fichas técnicas, gráficas longitudinales y descarga masiva en archivo .ZIP por curso.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Tutorial Interactivo Paso a Paso -->
+  <section id="tutorial-guiado" class="card" style="padding: 2.5rem; border: 2px solid var(--c-blue-tint); margin-bottom: 3rem; background: #FFFFFF;">
+    <div style="border-bottom: 2px solid var(--c-blue-tint); padding-bottom: 1rem; margin-bottom: 2rem;">
+      <div style="font-size: var(--fs-xs); font-weight: 700; color: var(--c-blue-light); text-transform: uppercase; letter-spacing: 0.05em;">
+        Guía de Aprendizaje e Implementación
+      </div>
+      <h2 style="color: var(--c-blue-dark); margin-top: 0.3rem;">
+        Tutorial: Cómo Funciona REIA Paso a Paso
+      </h2>
+      <p style="color: var(--text-secondary); font-size: var(--fs-md);">
+        Sigue esta secuencia metodológica para aprovechar al máximo las capacidades de evaluación formativa en tu institución.
+      </p>
+    </div>
+
+    <!-- Navegación de Pasos / Stepper -->
+    <div style="display: flex; gap: 0.5rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; flex-wrap: wrap;">
+      <button onclick="mostrarPasoTutorial(1)" id="btn-paso-1" class="tab-btn active" style="padding: 0.6rem 1.2rem; font-size: var(--fs-sm);">
+        Paso 1: Estructuración
+      </button>
+      <button onclick="mostrarPasoTutorial(2)" id="btn-paso-2" class="tab-btn" style="padding: 0.6rem 1.2rem; font-size: var(--fs-sm);">
+        Paso 2: Registro y Voz
+      </button>
+      <button onclick="mostrarPasoTutorial(3)" id="btn-paso-3" class="tab-btn" style="padding: 0.6rem 1.2rem; font-size: var(--fs-sm);">
+        Paso 3: Inferencia IA
+      </button>
+      <button onclick="mostrarPasoTutorial(4)" id="btn-paso-4" class="tab-btn" style="padding: 0.6rem 1.2rem; font-size: var(--fs-sm);">
+        Paso 4: Informes y Lotes
+      </button>
+      <button onclick="mostrarPasoTutorial(5)" id="btn-paso-5" class="tab-btn" style="padding: 0.6rem 1.2rem; font-size: var(--fs-sm);">
+        Paso 5: Plantillas y Ajustes
+      </button>
+    </div>
+
+    <!-- Contenido de los Pasos -->
+
+    <!-- Paso 1 -->
+    <div id="contenido-paso-1" class="paso-tutorial-item">
+      <div style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 2rem; align-items: start;">
+        <div>
+          <span class="resultado-badge acuerdo">Configuración Inicial</span>
+          <h3 style="color: var(--c-blue-dark); font-size: 1.3rem; margin: 0.6rem 0;">
+            1. Configurar Estudiantes, Cursos y Rúbricas
+          </h3>
+          <p style="color: var(--text-secondary); line-height: 1.7; font-size: var(--fs-md); margin-bottom: 1rem;">
+            Antes de comenzar las observaciones, debes definir la estructura institucional:
+          </p>
+          <ul style="padding-left: 1.2rem; color: var(--text-secondary); line-height: 1.7; font-size: var(--fs-sm); margin-bottom: 1.5rem;">
+            <li><strong>Estudiantes:</strong> Registra alumnos manualmente o impórtalos masivamente mediante un archivo CSV con nombres, apellidos, tipo de documento y fecha de nacimiento.</li>
+            <li><strong>Cursos y Asignaturas:</strong> Crea los grupos (p. ej. <em>Once A</em>, <em>Noveno B</em>) y vincula a los estudiantes y docentes titulares.</li>
+            <li><strong>Rúbricas de Evaluación:</strong> Define las competencias y dimensiones pedagógicas (p. ej. Pensamiento Lógico, Convivencia, Comunicación) con descriptores cualitativos para cada nivel (Bajo, Básico, Alto, Superior).</li>
+          </ul>
+          <div style="display: flex; gap: 0.8rem;">
+            <a href="/estudiantes" class="btn primary" style="font-size: var(--fs-xs);">Ir a Estudiantes</a>
+            <a href="/cursos-clases" class="btn secondary" style="font-size: var(--fs-xs);">Ir a Cursos</a>
+            <a href="/rubricas" class="btn secondary" style="font-size: var(--fs-xs);">Ir a Rúbricas</a>
+          </div>
+        </div>
+
+        <div style="background: var(--bg-main); padding: 1.5rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+          <h4 style="color: var(--c-blue-dark); font-size: 0.95rem; margin-bottom: 0.6rem;">
+            Recomendación Metodológica
+          </h4>
+          <p style="color: var(--text-muted); font-size: var(--fs-xs); line-height: 1.6; margin-bottom: 1rem;">
+            Una rúbrica bien redactada con descriptores claros permite que los modelos de IA evalúen la observación del docente con una precisión de inferencia superior al 90%.
+          </p>
+          <div style="background: #FFFFFF; padding: 0.8rem; border-radius: var(--radius-sm); border-left: 3px solid var(--c-blue-dark); font-size: var(--fs-xs);">
+            <strong>Escala Institucional REIA:</strong><br>
+            • Superior: 4.6 - 5.0<br>
+            • Alto: 4.0 - 4.5<br>
+            • Básico: 3.0 - 3.9<br>
+            • Bajo: 0.0 - 2.9
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Paso 2 -->
+    <div id="contenido-paso-2" class="paso-tutorial-item" style="display: none;">
+      <div style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 2rem; align-items: start;">
+        <div>
+          <span class="resultado-badge acuerdo">Captura en Tiempo Real</span>
+          <h3 style="color: var(--c-blue-dark); font-size: 1.3rem; margin: 0.6rem 0;">
+            2. Registrar Observaciones Diarias por Voz o Texto
+          </h3>
+          <p style="color: var(--text-secondary); line-height: 1.7; font-size: var(--fs-md); margin-bottom: 1rem;">
+            Durante o al finalizar tu clase, ingresa a la <strong>Bitácora de Reportes</strong> para registrar el desempeño de un estudiante:
+          </p>
+          <ul style="padding-left: 1.2rem; color: var(--text-secondary); line-height: 1.7; font-size: var(--fs-sm); margin-bottom: 1.5rem;">
+            <li><strong>Selección rápida:</strong> Elige el estudiante, la asignatura y la rúbrica correspondiente.</li>
+            <li><strong>Dictado por Voz:</strong> Presiona el botón del micrófono para dictar tus comentarios en lenguaje natural. El sistema transcribirá tus palabras al instante.</li>
+            <li><strong>Soporte Whisper:</strong> Si grabaste un audio previamente en tu dispositivo, puedes adjuntarlo para su transcripción automática.</li>
+          </ul>
+          <div style="display: flex; gap: 0.8rem;">
+            <a href="/reportes" class="btn primary" style="font-size: var(--fs-xs);">Abrir Bitácora de Observaciones</a>
+          </div>
+        </div>
+
+        <div style="background: var(--bg-main); padding: 1.5rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+          <h4 style="color: var(--c-blue-dark); font-size: 0.95rem; margin-bottom: 0.6rem;">
+            Ejemplo de Observación Docente
+          </h4>
+          <div style="background: #FFFFFF; padding: 1rem; border-radius: var(--radius-sm); font-size: var(--fs-xs); color: var(--text-secondary); line-height: 1.6; border: 1px solid var(--border-color);">
+            <em>"Camila demostró un excelente dominio conceptual en la resolución de ecuaciones cuadráticas, ayudando a su compañero Mateo a comprender los pasos del despeje. Mostró alta concentración y liderazgo colaborativo."</em>
+          </div>
+          <div style="margin-top: 0.8rem; font-size: var(--fs-xs); color: var(--text-muted);">
+            El sistema anonimiza automáticamente los nombres antes de cualquier inferencia externa.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Paso 3 -->
+    <div id="contenido-paso-3" class="paso-tutorial-item" style="display: none;">
+      <div style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 2rem; align-items: start;">
+        <div>
+          <span class="resultado-badge acuerdo">Procesamiento Inteligente</span>
+          <h3 style="color: var(--c-blue-dark); font-size: 1.3rem; margin: 0.6rem 0;">
+            3. Inferencia de Rúbricas con Inteligencia Artificial
+          </h3>
+          <p style="color: var(--text-secondary); line-height: 1.7; font-size: var(--fs-md); margin-bottom: 1rem;">
+            Al hacer clic en <strong>Sugerir Calificación con IA</strong>, el motor de inteligencia artificial analiza la observación cualitativa y:
+          </p>
+          <ul style="padding-left: 1.2rem; color: var(--text-secondary); line-height: 1.7; font-size: var(--fs-sm); margin-bottom: 1.5rem;">
+            <li>Contrasta el texto con los descriptores de cada dimensión de la rúbrica seleccionada.</li>
+            <li>Sugiere notas cuantitativas entre 0.0 y 5.0 para cada criterio pedagógico.</li>
+            <li>Permite al docente <strong>ajustar o confirmar</strong> las notas sugeridas antes de guardar el registro en la base de datos institucional.</li>
+          </ul>
+          <div style="display: flex; gap: 0.8rem;">
+            <a href="/reportes" class="btn primary" style="font-size: var(--fs-xs);">Probar Inferencia en Vivo</a>
+          </div>
+        </div>
+
+        <div style="background: var(--bg-main); padding: 1.5rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+          <h4 style="color: var(--c-blue-dark); font-size: 0.95rem; margin-bottom: 0.6rem;">
+            Sugerencia Resultante (Ejemplo)
+          </h4>
+          <div style="background: #FFFFFF; padding: 1rem; border-radius: var(--radius-sm); font-size: var(--fs-xs); border: 1px solid var(--border-color);">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
+              <span>Pensamiento Lógico:</span>
+              <strong style="color: #15803d;">4.8 (Superior)</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
+              <span>Trabajo en Equipo:</span>
+              <strong style="color: #15803d;">4.7 (Superior)</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span>Autorregulación:</span>
+              <strong style="color: var(--c-blue-light);">4.3 (Alto)</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Paso 4 -->
+    <div id="contenido-paso-4" class="paso-tutorial-item" style="display: none;">
+      <div style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 2rem; align-items: start;">
+        <div>
+          <span class="resultado-badge acuerdo">Generación Documental</span>
+          <h3 style="color: var(--c-blue-dark); font-size: 1.3rem; margin: 0.6rem 0;">
+            4. Generar Informes Individuales, Colectivos y Lotes ZIP
+          </h3>
+          <p style="color: var(--text-secondary); line-height: 1.7; font-size: var(--fs-md); margin-bottom: 1rem;">
+            En el módulo de <strong>Informes</strong>, puedes consolidar la trayectoria del período:
+          </p>
+          <ul style="padding-left: 1.2rem; color: var(--text-secondary); line-height: 1.7; font-size: var(--fs-sm); margin-bottom: 1.5rem;">
+            <li><strong>Informe Individual:</strong> Diagnóstico formativo, fortalezas, aspectos por mejorar y plan de acción de un estudiante con su nombre real reincorporado localmente.</li>
+            <li><strong>Informe Colectivo de Aula:</strong> Síntesis del clima de grupo, tendencias de la cohorte y recomendaciones para el director de curso.</li>
+            <li><strong>Descarga Masiva en ZIP:</strong> Genera en 1 solo clic los informes individuales de todos los alumnos de un curso en formato Word (.docx) o PDF.</li>
+          </ul>
+          <div style="display: flex; gap: 0.8rem;">
+            <a href="/informes" class="btn primary" style="font-size: var(--fs-xs);">Ir a Generación de Informes</a>
+          </div>
+        </div>
+
+        <div style="background: var(--bg-main); padding: 1.5rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+          <h4 style="color: var(--c-blue-dark); font-size: 0.95rem; margin-bottom: 0.6rem;">
+            Formatos de Exportación Oficial
+          </h4>
+          <div style="display: flex; flex-direction: column; gap: 0.6rem; font-size: var(--fs-xs);">
+            <div style="background: #FFFFFF; padding: 0.8rem; border-radius: var(--radius-sm); border-left: 4px solid var(--c-blue-light);">
+              <strong>Microsoft Word (.docx):</strong> Totalmente editable, con membrete oficial, ficha técnica y firmas institucionales.
+            </div>
+            <div style="background: #FFFFFF; padding: 0.8rem; border-radius: var(--radius-sm); border-left: 4px solid var(--c-red);">
+              <strong>Adobe PDF (.pdf):</strong> Documento de alta fidelidad tipográfica, tablas consolidadas y gráficas longitudinales incrustadas.
+            </div>
+            <div style="background: #FFFFFF; padding: 0.8rem; border-radius: var(--radius-sm); border-left: 4px solid #f8a719;">
+              <strong>Archivo Comprimido (.zip):</strong> Paquete institucional con los informes de toda la clase ordenados alfabéticamente.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Paso 5 -->
+    <div id="contenido-paso-5" class="paso-tutorial-item" style="display: none;">
+      <div style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 2rem; align-items: start;">
+        <div>
+          <span class="resultado-badge acuerdo">Personalización y Ajustes</span>
+          <h3 style="color: var(--c-blue-dark); font-size: 1.3rem; margin: 0.6rem 0;">
+            5. Plantillas Personalizadas y Conmutación de IA
+          </h3>
+          <p style="color: var(--text-secondary); line-height: 1.7; font-size: var(--fs-md); margin-bottom: 1rem;">
+            Adapta REIA a las directrices pedagógicas de tu colegio o facultad:
+          </p>
+          <ul style="padding-left: 1.2rem; color: var(--text-secondary); line-height: 1.7; font-size: var(--fs-sm); margin-bottom: 1.5rem;">
+            <li><strong>Gestión de Plantillas:</strong> Crea, edita y elimina modelos de informe para comités de evaluación, orientación escolar o proyectos transversales.</li>
+            <li><strong>Selección de Motor de IA:</strong> Cambia en caliente entre OpenAI (GPT-4o), Anthropic (Claude 3.5 Sonnet) o el <strong>Modo Simulado Offline</strong> (ideal para pruebas y demostraciones sin consumo de API).</li>
+            <li><strong>Seguridad de Claves:</strong> Las API keys se almacenan de manera segura en el archivo .env del servidor, sin exponerse en el código HTML cliente.</li>
+          </ul>
+          <div style="display: flex; gap: 0.8rem;">
+            <a href="/configuracion" class="btn primary" style="font-size: var(--fs-xs);">Ir a Ajustes del Sistema</a>
+          </div>
+        </div>
+
+        <div style="background: var(--bg-main); padding: 1.5rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+          <h4 style="color: var(--c-blue-dark); font-size: 0.95rem; margin-bottom: 0.6rem;">
+            Proveedores Soportados
+          </h4>
+          <div style="background: #FFFFFF; padding: 1rem; border-radius: var(--radius-sm); font-size: var(--fs-xs); line-height: 1.7; border: 1px solid var(--border-color);">
+            • <strong>OpenAI:</strong> GPT-4o / GPT-4o-mini<br>
+            • <strong>Anthropic:</strong> Claude 3.5 Sonnet / Claude 3.5 Haiku<br>
+            • <strong>Modo Simulado:</strong> Heurística probabilística local sin costo ni conexión externa requerida.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- Demostrador Interactivo del Protocolo Zero-PII -->
+  <section class="card" style="padding: 2.5rem; border: 2px solid var(--c-blue-tint); margin-bottom: 3rem; background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);">
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <span class="resultado-badge acuerdo">Seguridad Demostrable</span>
+      <h2 style="color: var(--c-blue-dark); margin-top: 0.4rem;">
+        Simulador Interactivo: Flujo de Anonimización Zero-PII
+      </h2>
+      <p style="color: var(--text-muted); font-size: var(--fs-base); max-width: 650px; margin: 0 auto;">
+        Comprueba en tiempo real cómo viaja la información entre tu navegador y los motores de IA sin comprometer la identidad de los estudiantes.
+      </p>
+    </div>
+
+    <!-- Controles del Simulador -->
+    <div style="display: flex; justify-content: center; gap: 0.8rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+      <button type="button" onclick="cargarSimulacion('academico')" class="btn secondary" style="font-size: var(--fs-xs);">
+        Caso 1: Rendimiento Académico
+      </button>
+      <button type="button" onclick="cargarSimulacion('convivencia')" class="btn secondary" style="font-size: var(--fs-xs);">
+        Caso 2: Convivencia y Emocional
+      </button>
+      <button type="button" onclick="cargarSimulacion('liderazgo')" class="btn secondary" style="font-size: var(--fs-xs);">
+        Caso 3: Trabajo en Equipo y Liderazgo
+      </button>
+    </div>
+
+    <!-- Comparador Visual de 3 Fases -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.2rem;">
+      
+      <!-- Fase 1: Lo que escribe el docente -->
+      <div style="background: #FFFFFF; padding: 1.2rem; border-radius: var(--radius-sm); border: 1.5px solid var(--border-color); box-shadow: var(--shadow);">
+        <div style="font-weight: 700; color: var(--c-blue-dark); font-size: var(--fs-sm); margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
+          <span>1. En tu Navegador</span>
+          <span style="font-size: 0.7rem; background: #EEF2F8; padding: 0.2rem 0.5rem; border-radius: 4px; color: var(--c-blue-dark);">Datos Reales</span>
+        </div>
+        <div id="sim-fase-1" style="font-size: var(--fs-xs); color: var(--text-secondary); line-height: 1.6; min-height: 110px; background: #FAFAFA; padding: 0.8rem; border-radius: 4px; border: 1px dashed #CBD5E1;">
+          "Santiago Gómez demostró gran agilidad mental en el laboratorio de Física, coordinando los cálculos con Valentina Pérez."
+        </div>
+      </div>
+
+      <!-- Fase 2: Lo que viaja a la IA -->
+      <div style="background: #FFFFFF; padding: 1.2rem; border-radius: var(--radius-sm); border: 1.5px solid var(--c-blue-soft); box-shadow: var(--shadow);">
+        <div style="font-weight: 700; color: var(--c-blue-light); font-size: var(--fs-sm); margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
+          <span>2. Enviado a la IA</span>
+          <span style="font-size: 0.7rem; background: #D9E1EF; padding: 0.2rem 0.5rem; border-radius: 4px; color: var(--c-blue-dark); font-weight: 700;">Zero-PII Tokenizado</span>
+        </div>
+        <div id="sim-fase-2" style="font-size: var(--fs-xs); color: #00387D; line-height: 1.6; min-height: 110px; background: #F0F4FF; padding: 0.8rem; border-radius: 4px; border: 1px dashed #93AAC9;">
+          "[NOMBRE_ESTUDIANTE] demostró gran agilidad mental en el laboratorio de Física, coordinando los cálculos con [COMPANERO_1]."
+        </div>
+      </div>
+
+      <!-- Fase 3: Informe Final Oficial -->
+      <div style="background: #FFFFFF; padding: 1.2rem; border-radius: var(--radius-sm); border: 1.5px solid #15803d; box-shadow: var(--shadow);">
+        <div style="font-weight: 700; color: #15803d; font-size: var(--fs-sm); margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
+          <span>3. Informe Descargado</span>
+          <span style="font-size: 0.7rem; background: #DCFCE7; padding: 0.2rem 0.5rem; border-radius: 4px; color: #15803d; font-weight: 700;">Reconstrucción Local</span>
+        </div>
+        <div id="sim-fase-3" style="font-size: var(--fs-xs); color: var(--text-secondary); line-height: 1.6; min-height: 110px; background: #F0FDF4; padding: 0.8rem; border-radius: 4px; border: 1px dashed #86EFAC;">
+          "Durante la sesión, Santiago Gómez evidenció un desempeño sobresaliente en la resolución de problemas experimentales..."
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Preguntas Frecuentes (FAQ) -->
+  <section class="card" style="padding: 2.5rem; border: 2px solid var(--c-blue-tint); margin-bottom: 3rem; background: #FFFFFF;">
+    <div style="margin-bottom: 1.8rem;">
+      <span class="resultado-badge acuerdo">Preguntas Frecuentes</span>
+      <h2 style="color: var(--c-blue-dark); margin-top: 0.4rem;">
+        Resolución de Dudas Frecuentes
+      </h2>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 1rem;">
+      
+      <details style="background: var(--bg-main); padding: 1rem 1.2rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); cursor: pointer;">
+        <summary style="font-weight: 700; color: var(--c-blue-dark); font-size: var(--fs-md);">
+          ¿Cómo se garantiza la protección de los datos de los menores de edad?
+        </summary>
+        <p style="color: var(--text-secondary); font-size: var(--fs-sm); line-height: 1.6; margin-top: 0.6rem;">
+          REIA implementa una arquitectura Zero-PII estricta. El servidor y el navegador reemplazan cualquier nombre o número de identificación por tokens anónimos ([NOMBRE_ESTUDIANTE], [COMPANERO_1]) antes de hacer cualquier petición a OpenAI o Anthropic. Los nombres reales se reinsertan en el documento únicamente en tu entorno local.
+        </p>
+      </details>
+
+      <details style="background: var(--bg-main); padding: 1rem 1.2rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); cursor: pointer;">
+        <summary style="font-weight: 700; color: var(--c-blue-dark); font-size: var(--fs-md);">
+          ¿Puedo utilizar REIA sin tener una clave de API de OpenAI o Anthropic?
+        </summary>
+        <p style="color: var(--text-secondary); font-size: var(--fs-sm); line-height: 1.6; margin-top: 0.6rem;">
+          Sí. REIA incluye un <strong>Modo Simulado Offline</strong> completamente funcional. Este modo analiza heurísticamente el texto de la observación y redacta informes formativos estructurados sin requerir conexión a internet ni generar costos de API.
+        </p>
+      </details>
+
+      <details style="background: var(--bg-main); padding: 1rem 1.2rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); cursor: pointer;">
+        <summary style="font-weight: 700; color: var(--c-blue-dark); font-size: var(--fs-md);">
+          ¿Cuál es la diferencia entre un informe individual y un informe colectivo de aula?
+        </summary>
+        <p style="color: var(--text-secondary); font-size: var(--fs-sm); line-height: 1.6; margin-top: 0.6rem;">
+          El <strong>Informe Individual</strong> analiza la trayectoria formativa de un alumno específico, destacando sus fortalezas, oportunidades de crecimiento y plan de acción personal. Por su parte, el <strong>Informe Colectivo de Aula</strong> evalúa las dinámicas del grupo escolar completo (p. ej. Once A), clima de convivencia, patrones colectivos y recomendaciones pedagógicas para el director de curso.
+        </p>
+      </details>
+
+      <details style="background: var(--bg-main); padding: 1rem 1.2rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); cursor: pointer;">
+        <summary style="font-weight: 700; color: var(--c-blue-dark); font-size: var(--fs-md);">
+          ¿Cómo descargo los informes de todos los estudiantes de un curso a la vez?
+        </summary>
+        <p style="color: var(--text-secondary); font-size: var(--fs-sm); line-height: 1.6; margin-top: 0.6rem;">
+          En la pestaña <strong>Informes</strong>, dirígete a la sección "Generación y Descarga Masiva por Curso (.ZIP)", selecciona el curso deseado, el formato (Word o PDF) y el rango de fechas. El sistema generará automáticamente todos los informes individuales y los descargará en un archivo comprimido .ZIP listo para entregar a las familias.
+        </p>
+      </details>
+
+    </div>
+  </section>
+
+  <!-- Banner de Llamado a la Acción Final -->
+  <section class="card" style="background: var(--c-blue-dark); color: #FFFFFF; text-align: center; padding: 3rem 2rem; border-radius: var(--radius);">
+    <h2 style="color: #FFFFFF; font-size: 1.8rem; margin-bottom: 0.8rem;">
+      Comienza a Construir Informes Formativos de Alto Impacto
+    </h2>
+    <p style="color: #D9E1EF; font-size: var(--fs-base); max-width: 600px; margin: 0 auto 1.8rem auto;">
+      Ahorra horas en la redacción de informes cualitativos mientras enriqueces el seguimiento pedagógico de tus estudiantes.
+    </p>
+    <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+      <a href="/reportes" class="btn primary" style="background: #f8a719; color: #00135B !important; font-weight: 700; padding: 0.85rem 1.8rem; font-size: var(--fs-base);">
+        Ingresar a la Bitácora
+      </a>
+      <a href="/informes" class="btn secondary" style="background: rgba(255, 255, 255, 0.15); color: #FFFFFF !important; font-weight: 600; padding: 0.85rem 1.8rem; font-size: var(--fs-base); border: 1px solid rgba(255, 255, 255, 0.3);">
+        Generador de Informes
+      </a>
+    </div>
+  </section>
+
+</div>
+
+<script>
+function mostrarPasoTutorial(pasoNumero) {
+  // Ocultar todos los pasos
+  for (let i = 1; i <= 5; i++) {
+    const item = document.getElementById('contenido-paso-' + i);
+    const btn = document.getElementById('btn-paso-' + i);
+    if (item) item.style.display = 'none';
+    if (btn) btn.classList.remove('active');
+  }
+
+  // Mostrar el paso seleccionado
+  const itemActivo = document.getElementById('contenido-paso-' + pasoNumero);
+  const btnActivo = document.getElementById('btn-paso-' + pasoNumero);
+  if (itemActivo) itemActivo.style.display = 'block';
+  if (btnActivo) btnActivo.classList.add('active');
+}
+
+function cargarSimulacion(caso) {
+  const f1 = document.getElementById('sim-fase-1');
+  const f2 = document.getElementById('sim-fase-2');
+  const f3 = document.getElementById('sim-fase-3');
+
+  if (caso === 'academico') {
+    f1.innerHTML = '"Santiago Gómez demostró gran agilidad mental en el laboratorio de Física, coordinando los cálculos con Valentina Pérez."';
+    f2.innerHTML = '"[NOMBRE_ESTUDIANTE] demostró gran agilidad mental en el laboratorio de Física, coordinando los cálculos con [COMPANERO_1]."';
+    f3.innerHTML = '"Durante la sesión, Santiago Gómez evidenció un desempeño sobresaliente en la resolución de problemas experimentales..."';
+  } else if (caso === 'convivencia') {
+    f1.innerHTML = '"Durante el descanso, Mariana Ríos tuvo un altercado verbal con Carlos Andrade por un desacuerdo en el juego de voleibol."';
+    f2.innerHTML = '"Durante el descanso, [NOMBRE_ESTUDIANTE] tuvo un altercado verbal con [COMPANERO_1] por un desacuerdo en el juego de voleibol."';
+    f3.innerHTML = '"En el ámbito socioemocional, Mariana Ríos requiere fortalecimiento en herramientas de mediación pacífica y comunicación asertiva..."';
+  } else if (caso === 'liderazgo') {
+    f1.innerHTML = '"Felipe Torres organizó el debate de Ciencias Sociales, distribuyendo equitativamente los turnos de palabra del grupo."';
+    f2.innerHTML = '"[NOMBRE_ESTUDIANTE] organizó el debate de Ciencias Sociales, distribuyendo equitativamente los turnos de palabra del grupo."';
+    f3.innerHTML = '"Felipe Torres se destaca por su iniciativa y liderazgo positivo, promoviendo espacios de participación ordenada y argumentada..."';
+  }
+}
+</script>
+{% endblock %}

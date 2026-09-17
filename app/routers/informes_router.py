@@ -58,9 +58,9 @@ def ver_informe_guardado(informe_id: int, request: Request, db: Session = Depend
         if est:
             datos_cabecera = {
                 "Estudiante": est.nombre_completo,
-                "Identificacion": f"{est.tipo_documento} {est.numero_documento}",
-                "Grado": f"{est.grado_actual} grado",
-                "Periodo de Evaluacion": f"{inf.fecha_inicio} al {inf.fecha_fin}"
+                "Identificación": f"{est.tipo_documento} {est.numero_documento}",
+                "Grado": f"{est.grado_actual}º grado",
+                "Período de Evaluación": f"{inf.fecha_inicio} al {inf.fecha_fin}"
             }
             # Asegurar que cualquier placeholder residual sea sustituido por el nombre real
             contenido_narrativo = PrivacyService.reemplazar_tokens_locales(contenido_narrativo, est)
@@ -69,9 +69,9 @@ def ver_informe_guardado(informe_id: int, request: Request, db: Session = Depend
         if cur:
             datos_cabecera = {
                 "Curso": cur.nombre,
-                "Grado": f"{cur.grado} grado",
+                "Grado": f"{cur.grado}º grado",
                 "Director": cur.director_curso or "N/A",
-                "Periodo de Analisis": f"{inf.fecha_inicio} al {inf.fecha_fin}"
+                "Período de Análisis": f"{inf.fecha_inicio} al {inf.fecha_fin}"
             }
 
     titulo_informe = f"Informe Oficial: {datos_cabecera.get('Estudiante', datos_cabecera.get('Curso', 'Institucional'))}"
@@ -137,14 +137,14 @@ def generar_informe(
             return HTMLResponse("<div class='card'>Estudiante no encontrado.</div>")
 
         est_obj_id = estudiante.id
-        titulo_informe = f"Informe de Evaluacion Formativa: {estudiante.nombre_completo}"
+        titulo_informe = f"Informe de Evaluación Formativa: {estudiante.nombre_completo}"
         curso_nombre = estudiante.cursos[0].nombre if estudiante.cursos else "Sin Curso"
         datos_cabecera = {
             "Estudiante": estudiante.nombre_completo,
-            "Identificacion": f"{estudiante.tipo_documento} {estudiante.numero_documento}",
-            "Grado y Curso": f"{estudiante.grado_actual} grado ({curso_nombre})",
-            "Edad": f"{estudiante.edad} anos",
-            "Periodo de Evaluacion": f"{fecha_inicio} al {fecha_fin}"
+            "Identificación": f"{estudiante.tipo_documento} {estudiante.numero_documento}",
+            "Grado y Curso": f"{estudiante.grado_actual}º grado ({curso_nombre})",
+            "Edad": f"{estudiante.edad} años",
+            "Período de Evaluación": f"{fecha_inicio} al {fecha_fin}"
         }
 
         query_rep = db.query(Reporte).filter(
@@ -182,7 +182,7 @@ def generar_informe(
                 if dim.clave in series_dims:
                     series_nombradas[dim.nombre] = series_dims[dim.clave]
                     prom = sum(series_dims[dim.clave]) / len(series_dims[dim.clave]) if series_dims[dim.clave] else 0.0
-                    nivel = "Superior" if prom >= 4.6 else ("Alto" if prom >= 4.0 else ("Basico" if prom >= 3.0 else "Bajo"))
+                    nivel = "Superior" if prom >= 4.6 else ("Alto" if prom >= 4.0 else ("Básico" if prom >= 3.0 else "Bajo"))
                     tabla_rubrica.append({"dimension": dim.nombre, "promedio": prom, "nivel": nivel})
         else:
             series_nombradas = series_dims
@@ -192,7 +192,7 @@ def generar_informe(
                 grafica_base64 = ChartService.generar_grafica_individual_base64(
                     fechas=fechas_str,
                     series_dimensiones=series_nombradas,
-                    nombre_rubrica=rubrica.nombre if rubrica else "Evolucion Formativa"
+                    nombre_rubrica=rubrica.nombre if rubrica else "Evolución Formativa"
                 )
             except Exception as e:
                 print(f"Error generando grafica individual: {e}")
@@ -216,9 +216,9 @@ def generar_informe(
         titulo_informe = f"Informe Colectivo de Aula: {curso.nombre}"
         datos_cabecera = {
             "Curso / Cohorte": curso.nombre,
-            "Grado": f"{curso.grado} de Educacion Basica/Media",
+            "Grado": f"{curso.grado}º de Educación Básica/Media",
             "Director de Curso": curso.director_curso or "N/A",
-            "Periodo de Analisis": f"{fecha_inicio} al {fecha_fin}"
+            "Período de Análisis": f"{fecha_inicio} al {fecha_fin}"
         }
 
         query_rep = db.query(Reporte).filter(
@@ -416,7 +416,7 @@ def descargar_masivo_zip(
                     if dim.clave in series_dims:
                         series_nombradas[dim.nombre] = series_dims[dim.clave]
                         prom = sum(series_dims[dim.clave]) / len(series_dims[dim.clave]) if series_dims[dim.clave] else 0.0
-                        nivel = "Superior" if prom >= 4.6 else ("Alto" if prom >= 4.0 else ("Basico" if prom >= 3.0 else "Bajo"))
+                        nivel = "Superior" if prom >= 4.6 else ("Alto" if prom >= 4.0 else ("Básico" if prom >= 3.0 else "Bajo"))
                         tabla_rubrica.append({"dimension": dim.nombre, "promedio": prom, "nivel": nivel})
             else:
                 series_nombradas = series_dims
@@ -427,7 +427,7 @@ def descargar_masivo_zip(
                     grafica_base64 = ChartService.generar_grafica_individual_base64(
                         fechas=fechas_str,
                         series_dimensiones=series_nombradas,
-                        nombre_rubrica=rubrica.nombre if rubrica else "Evolucion Formativa"
+                        nombre_rubrica=rubrica.nombre if rubrica else "Evolución Formativa"
                     )
                 except Exception as e:
                     print(f"Error generando grafica para {est.nombre_completo}: {e}")
@@ -440,17 +440,17 @@ def descargar_masivo_zip(
                 )
                 contenido_narrativo = PrivacyService.reemplazar_tokens_locales(texto_ia_bruto, est)
             else:
-                contenido_narrativo = f"Durante el periodo del {fecha_inicio} al {fecha_fin}, el estudiante {est.nombre_completo} ha participado en las actividades academicas curriculares. Se recomienda mantener el acompanamiento pedagogico."
+                contenido_narrativo = f"Durante el período del {fecha_inicio} al {fecha_fin}, el estudiante {est.nombre_completo} ha participado en las actividades académicas curriculares. Se recomienda mantener el acompañamiento pedagógico."
 
             curso_est_nombre = est.cursos[0].nombre if est.cursos else nombre_grupo
             datos_cabecera = {
                 "Estudiante": est.nombre_completo,
-                "Identificacion": f"{est.tipo_documento} {est.numero_documento}",
-                "Grado y Curso": f"{est.grado_actual} grado ({curso_est_nombre})",
-                "Edad": f"{est.edad} anos",
-                "Periodo de Evaluacion": f"{fecha_inicio} al {fecha_fin}"
+                "Identificación": f"{est.tipo_documento} {est.numero_documento}",
+                "Grado y Curso": f"{est.grado_actual}º grado ({curso_est_nombre})",
+                "Edad": f"{est.edad} años",
+                "Período de Evaluación": f"{fecha_inicio} al {fecha_fin}"
             }
-            titulo_informe = f"Informe de Evaluacion Formativa: {est.nombre_completo}"
+            titulo_informe = f"Informe de Evaluación Formativa: {est.nombre_completo}"
 
             # Guardar en BD para historial
             nuevo_informe = InformeGenerado(
