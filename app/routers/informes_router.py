@@ -317,7 +317,7 @@ def descargar_docx(payload_json: str = Form(...)):
     return Response(
         content=docx_bytes,
         media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        headers={"Content-Disposition": "attachment; filename=Informe_REIA_Oficial.docx"}
+        headers={"Content-Disposition": "attachment; filename=Informe_Estudiante360_Oficial.docx"}
     )
 
 @router.post("/descargar-pdf")
@@ -334,7 +334,7 @@ def descargar_pdf(payload_json: str = Form(...)):
     return Response(
         content=pdf_bytes,
         media_type="application/pdf",
-        headers={"Content-Disposition": "attachment; filename=Informe_REIA_Oficial.pdf"}
+        headers={"Content-Disposition": "attachment; filename=Informe_Estudiante360_Oficial.pdf"}
     )
 
 @router.post("/descargar-masivo-zip")

@@ -1,5 +1,5 @@
 /**
- * charts.js - Graficos interactivos con Chart.js para REIA
+ * charts.js - Graficos interactivos con Chart.js para Estudiante360
  * GovLab - Universidad de la Sabana.
  */
 

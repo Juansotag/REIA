@@ -7,7 +7,7 @@ def test_landing_page_y_tutorial():
     response = client.get("/")
     assert response.status_code == 200
     assert "Realimentación Estudiantil con Inteligencia Artificial" in response.text
-    assert "Tutorial: Cómo Funciona REIA Paso a Paso" in response.text
+    assert "Tutorial: Cómo Funciona Estudiante360 Paso a Paso" in response.text
     assert "Simulador Interactivo: Flujo de Anonimización Zero-PII" in response.text
 
     # Probar alias /inicio y /tutorial

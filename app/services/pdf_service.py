@@ -86,7 +86,7 @@ class PdfService:
         header_data = [
             [
                 Paragraph("<b>GovLab: Universidad de la Sabana</b>", style_body),
-                Paragraph("<b>REIA</b> | Reporte Oficial", ParagraphStyle("RightHdr", parent=style_body, alignment=2))
+                Paragraph("<b>Estudiante360</b> | Reporte Oficial", ParagraphStyle("RightHdr", parent=style_body, alignment=2))
             ]
         ]
         t_header = Table(header_data, colWidths=[300, 220])

@@ -30,7 +30,7 @@ def test_generacion_grafica_boxplots():
 
 def test_generacion_docx():
     docx_bytes = DocxService.generar_informe_docx(
-        titulo_informe="Informe de Prueba REIA",
+        titulo_informe="Informe de Prueba Estudiante360",
         datos_cabecera={"Estudiante": "Sofía Ramírez", "Curso": "Noveno B"},
         contenido_ia="### 1. Diagnóstico\nEl estudiante presenta un desempeño óptimo.",
         grafica_base64=None,

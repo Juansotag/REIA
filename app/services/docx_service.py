@@ -57,7 +57,7 @@ class DocxService:
         cell_title = header_table.cell(0, 1)
         p_title = cell_title.paragraphs[0]
         p_title.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-        r_tool = p_title.add_run("REIA: Evaluación Formativa\n")
+        r_tool = p_title.add_run("Estudiante360: Evaluación Formativa\n")
         r_tool.font.size = Pt(11)
         r_tool.bold = True
         r_tool.font.color.rgb = RGBColor(0, 19, 91)

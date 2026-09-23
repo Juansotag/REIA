@@ -206,7 +206,7 @@ def exportar_estudiantes(db: Session = Depends(get_db)):
     return Response(
         content=xlsx_bytes,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers={"Content-Disposition": "attachment; filename=Nomina_Estudiantes_REIA_2026.xlsx"}
+        headers={"Content-Disposition": "attachment; filename=Nomina_Estudiantes_Estudiante360_2026.xlsx"}
     )
 
 def random_suffix():

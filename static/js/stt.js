@@ -1,5 +1,5 @@
 /**
- * Controlador de Speech-to-Text (STT) y deteccion de companeros (Chiclets) para REIA.
+ * Controlador de Speech-to-Text (STT) y deteccion de companeros (Chiclets) para Estudiante360.
  * GovLab - Universidad de la Sabana.
  */
 

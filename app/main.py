@@ -22,7 +22,7 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(
-    title="REIA: Realimentación Estudiantil con Inteligencia Artificial",
+    title="Estudiante360: Realimentación Estudiantil con Inteligencia Artificial",
     description="Herramienta del GovLab de la Universidad de la Sabana para la construcción ágil y privada de reportes formativos.",
     version="1.0.0",
     lifespan=lifespan
