@@ -5,6 +5,7 @@ Genera informes oficiales con estilos institucionales, gráficas incrustadas y f
 """
 
 import io
+import os
 import base64
 from typing import Dict, Any
 from reportlab.lib.pagesizes import letter
@@ -83,14 +84,23 @@ class PdfService:
         story = []
 
         # 1. Cabecera
+        logo_path = "static/img/estudiante360_logo.png"
+        left_header = Paragraph("<b>GovLab: Universidad de la Sabana</b>", style_body)
+        if os.path.exists(logo_path):
+            try:
+                left_header = RLImage(logo_path, width=145, height=36)
+            except Exception:
+                pass
+
         header_data = [
             [
-                Paragraph("<b>GovLab: Universidad de la Sabana</b>", style_body),
-                Paragraph("<b>Estudiante360</b> | Reporte Oficial", ParagraphStyle("RightHdr", parent=style_body, alignment=2))
+                left_header,
+                Paragraph("<b>Estudiante360</b> | Reporte Oficial<br/><font size='8' color='#64748B'>GovLab • UniSabana</font>", ParagraphStyle("RightHdr", parent=style_body, alignment=2))
             ]
         ]
-        t_header = Table(header_data, colWidths=[300, 220])
+        t_header = Table(header_data, colWidths=[280, 240])
         t_header.setStyle(TableStyle([
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
             ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
             ("LINEBELOW", (0, 0), (-1, -1), 1.5, c_blue_dark)
         ]))

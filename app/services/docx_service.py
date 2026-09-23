@@ -39,20 +39,19 @@ class DocxService:
 
         # Logo si existe
         cell_logo = header_table.cell(0, 0)
-        logo_path = "static/img/GovLab_blanco.png"
+        logo_path = "static/img/estudiante360_logo.png"
         if os.path.exists(logo_path):
             try:
-                # El logo blanco queda excelente si se inserta o si se añade con fondo,
-                # o insertamos texto institucional estilizado
                 p_logo = cell_logo.paragraphs[0]
-                p_logo.add_run("GovLab\n").bold = True
+                p_logo.add_run().add_picture(logo_path, width=Inches(2.0))
+            except Exception:
+                p_logo = cell_logo.paragraphs[0]
+                p_logo.add_run("Estudiante360\n").bold = True
                 p_logo.runs[0].font.size = Pt(16)
                 p_logo.runs[0].font.color.rgb = RGBColor(0, 19, 91)
-                p_sub = p_logo.add_run("Universidad de la Sabana")
+                p_sub = p_logo.add_run("GovLab - Universidad de la Sabana")
                 p_sub.font.size = Pt(10)
                 p_sub.font.color.rgb = RGBColor(147, 170, 201)
-            except Exception:
-                pass
 
         cell_title = header_table.cell(0, 1)
         p_title = cell_title.paragraphs[0]

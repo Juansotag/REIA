@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}Estudiante360 - Realimentación Estudiantil con IA{% endblock %}</title>
   
+  <link rel="icon" type="image/png" href="/static/img/favicon.png">
+
   <!-- Estilos Institucionales GovLab / Universidad de la Sabana -->
   <link rel="stylesheet" href="/static/css/style.css">
 
@@ -26,13 +28,10 @@
   <header>
     <div class="header-inner">
       <div class="header-brand">
-        <a href="/" style="display: flex; align-items: center; gap: 0.8rem; text-decoration: none;">
+        <a href="/" style="display: flex; align-items: center; gap: 1rem; text-decoration: none;">
           <img src="/static/img/GovLab_blanco.png" alt="GovLab Universidad de la Sabana" class="header-logo">
           <div class="header-divider"></div>
-          <div>
-            <div class="header-title">GovLab - UniSabana</div>
-            <div class="header-subtitle" style="font-size: 1.1rem; line-height: 1;">Estudiante360</div>
-          </div>
+          <img src="/static/img/estudiante360_logo_nav_dark.png" alt="Estudiante360 - Seguimiento de Bienestar Estudiantil" style="height: 38px; width: auto; object-fit: contain;">
         </a>
       </div>
 
@@ -69,7 +68,10 @@
 
   <!-- Pie de Página Institucional -->
   <footer class="app-footer">
-    <div><strong>Estudiante360</strong> - Realimentación Estudiantil con Inteligencia Artificial</div>
+    <div style="display: flex; align-items: center; justify-content: center; gap: 0.6rem;">
+      <img src="/static/img/estudiante360_iso.png" alt="Estudiante360" style="height: 22px; width: auto; vertical-align: middle;">
+      <span><strong>Estudiante360</strong> - Realimentación y Seguimiento de Bienestar Estudiantil</span>
+    </div>
     <div style="margin-top: 0.2rem; opacity: 0.8;">
       Desarrollado por el <strong>GovLab de la Universidad de la Sabana</strong> - Sistema de Evaluación Formativa con Privacidad Zero-PII
     </div>
